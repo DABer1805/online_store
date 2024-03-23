@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1 style="text-align: center">Список товаров</h1>
+    <div class="container">
+        <div class="row">
+            {% for item in items %}
+                <div class="col-lg-3 col-sm-4 md-6">
+                    <div class="product-card">
+                        <div class="product-thumb">
+                            <a href="#"><img src="img/products/iphone_1.jpg" alt=""></a>
+                        </div>
+                        <div class="product-details">
+                            <h4><a href="#">iPhone</a></h4>
+                            <div class="product-bottom-details d-flex justify-content-between">
+                                <div class="product-price">
+                                    <small>$230.99</small> $99
+                                </div>
+                                <div class="product-links">
+                                    <a href="#"><i class="fas fa-shopping-cart"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}
