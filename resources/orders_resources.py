@@ -39,7 +39,7 @@ class OrdersListResource(Resource):
         return jsonify({
             'orders': [
                 item.to_dict(only=(
-                    'items_list', 'is_complited',
+                    'id', 'items_list', 'is_complited',
                     'user.mobile_phone', 'user.name'
                 ))
                 for item in orders

@@ -1,7 +1,8 @@
 from flask import jsonify
-from flask_restful import Resource, abort, reqparse
+from flask_restful import Resource, abort, reqparse, request
 
 from data import db_session
+from data.constants import MAX_PRICE
 from data.items import Item
 
 
@@ -12,7 +13,7 @@ class ItemsResource(Resource):
         item = session.query(Item).get(item_id)
         return jsonify(
             {'item': item.to_dict(only=(
-                'name', 'price', 'discount',
+                'id', 'name', 'price', 'discount',
                 'supplier', 'category'
             ))}
         )
@@ -30,11 +31,26 @@ class ItemsListResource(Resource):
     """ Получение списка всех товаров, которые имеются """
 
     def get(self):
+        categories = request.args.get('cat')
+        max_price = request.args.get('max_price')
+        if max_price is None:
+            max_price = MAX_PRICE
+        else:
+            max_price = float(max_price)
         session = db_session.create_session()
-        items = session.query(Item).all()
+        if categories:
+            categories = list(map(int, categories.split(',')))
+            items = session.query(Item).filter(
+                Item.category.in_(categories),
+                Item.price * (1 - Item.discount * 0.01) <= max_price
+            )
+        else:
+            items = session.query(Item).filter(
+                Item.price * (1 - Item.discount * 0.01) <= max_price
+            )
         return jsonify({
             'items': [
-                item.to_dict(only=('name', 'price', 'discount'))
+                item.to_dict(only=('id', 'name', 'price', 'discount'))
                 for item in items
             ]})
 

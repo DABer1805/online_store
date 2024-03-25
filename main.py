@@ -1,8 +1,9 @@
-from flask import Flask
+from flask import Flask, render_template, redirect, request, url_for
 from flask_restful import Api
+from requests import get, post
 
 from api import calculate_cost_api
-from data.constants import TEST_DB_NAME
+from data.constants import DB_NAME, MAX_PRICE
 from data import db_session
 from resources import orders_resources, users_resources, items_resources, \
     categories_resources, suppliers_resources
@@ -54,9 +55,6 @@ api.add_resource(suppliers_resources.SupplierListResource,
 api.add_resource(suppliers_resources.SupplierResource,
                  '/api/suppliers/<int:supplier_id>')
 
-app = Flask(__name__)
-app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
-
 login_manager = LoginManager()
 login_manager.init_app(app)
 
@@ -64,70 +62,151 @@ login_manager.init_app(app)
 @app.route('/logout')
 @login_required
 def logout():
+    """ Выход из профиля """
     logout_user()
-    return redirect("/")
+    # Перевод на страницу с выбором продуктов
+    return redirect("catalog")
 
 
 @login_manager.user_loader
 def load_user(user_id):
+    """ Загрузка пользователя """
     db_sess = db_session.create_session()
+    # Возвращаем пользователя
     return db_sess.query(User).get(user_id)
 
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    """ Авторизация """
+    # Создаем форму
     form = LoginForm()
+    # Если нажата кнопка авторизации
     if form.validate_on_submit():
+        # Создаем сессию подключения к БД
         db_sess = db_session.create_session()
+        # Получаем пользователя с введенным номером телефона
         user = db_sess.query(User).filter(
-            User.email == form.email.data).first()
+            User.mobile_phone == form.mobile_phone.data
+        ).first()
+        # Если пароль совпал и пользователь нашелся
         if user and user.check_password(form.password.data):
+            # Авторизизуем пользователя
             login_user(user, remember=form.remember_me.data)
-            return redirect("/")
+            # Перенаправляем пользователя на каталог
+            return redirect("catalog")
+        # Открываем страничку с формой авторизации и выводим уведомление о
+        # некорректности данных
         return render_template('login.html',
                                message="Неправильный логин или пароль",
                                form=form)
+    # Открываем страничку с формой авторизации
     return render_template('login.html', title='Авторизация', form=form)
 
 
 @app.route('/register', methods=['GET', 'POST'])
 def reqister():
+    """ Форма регистрации пользователя """
+    # Создаем форму
     form = RegisterForm()
+    # Если кнопка нажата
     if form.validate_on_submit():
+        # Если пароли не совпали
         if form.password.data != form.password_again.data:
+            # Открываем страничку с формой и выводим уведомление о
+            # некорректности данных
             return render_template('register.html', title='Регистрация',
                                    form=form,
                                    message="Пароли не совпадают")
+        # Создаем сессию подключения к БД
         db_sess = db_session.create_session()
-        if db_sess.query(User).filter(User.email == form.email.data).first():
+        # Проверяем нет ли в БД пользователя с таким номером
+        if db_sess.query(User).filter(
+                User.mobile_phone == form.mobile_phone.data
+        ).first():
+            # Открываем страничку с формой и выводим уведомление о
+            # некорректности данных
             return render_template('register.html', title='Регистрация',
                                    form=form,
                                    message="Такой пользователь уже есть")
-        user = User(
-            surname=form.surname.data,
-            name=form.name.data,
-            age=form.age.data,
-            position=form.position.data,
-            speciality=form.speciality.data,
-            address=form.address.data,
-            email=form.email.data
+        # Добавляем в БД нового пользователя
+        post(
+            'http://localhost:5000/api/users',
+            json={
+                'name': form.name.data,
+                'surname': form.surname.data,
+                'items_list': '',
+                'mobile_phone': form.mobile_phone.data
+            }
         )
+        # Получаем этого пользователя
+        user = db_sess.query(User).filter(
+            User.mobile_phone == form.mobile_phone.data
+        ).first()
+        # Устанавливаем ему хэшированный пароль
         user.set_password(form.password.data)
-        db_sess.add(user)
+        # Делаем коммит
         db_sess.commit()
+        # Перенаправляем на форму авторизации
         return redirect('/login')
+    # Открываем страничку с формой регистрации
     return render_template('register.html', title='Регистрация', form=form)
 
 
-@app.route("/")
-def index():
-    db_sess = db_session.create_session()
-    jobs = db_sess.query(Jobs).all()
-    return render_template("items_list.html", jobs=jobs)
+@app.route("/catalog", methods=['GET', 'POST'])
+def catalog():
+    """ Каталог с товарами """
+    # Параметры
+    params = {}
+    # Нажатые чекбоксы
+    checked_buttons = []
+    # Получаем категории, которые были переданы через параметры URL
+    cat = request.args.get('cat')
+    # Получаем через параметр URL цену, которая была выбрана пользователем
+    # на слайдере
+    cur_price = request.args.get('max_price')
+    # Если в параметре цена не указана
+    if cur_price is None:
+        # Устанавливаем цену как максимальную
+        cur_price = MAX_PRICE
+    # Если категории переданы через параметры
+    if cat:
+        # Устанавливаем в параметрах эти категории
+        params['cat'] = cat
+        # Добавляем в список нажатых кнопок эти категории
+        checked_buttons += list(map(int, cat.split(',')))
+    # Устанавливаем в параметрах ограничение по цене - текущую цену на
+    # слайдере
+    params['max_price'] = cur_price
+    # Если нажата кнопка фильтрации
+    if request.method == 'POST':
+        # Перенаправляем пользователя на каталог уже вместе с параметрами
+        return redirect(
+            f'/catalog?cat={",".join(request.form.getlist("cat"))}&'
+            f'max_price={request.form.get("price_range")}'
+        )
+    # Получаем список всех товаров с учетом параметров
+    items = get(
+        'http://localhost:5000/api/items', params=params
+    ).json()['items']
+    # Получчаем список всех категорий
+    categories = get(
+        'http://localhost:5000/api/categories'
+    ).json()['items']
+    # Открываем страничку с каталогом
+    return render_template(
+        "items_list.html", title='Продуктовый рай', cur_price=cur_price,
+        checked_buttons=checked_buttons, items=items, categories=categories,
+        max_price=MAX_PRICE
+    )
 
 
 def main():
-    db_session.global_init("db/shop.db")
+    # Устанавливаем соедениние с БД
+    db_session.global_init(f'db/{DB_NAME}')
+    # Подключаем api подсчета цены покупки
+    app.register_blueprint(calculate_cost_api.blueprint)
+    # Запускаем предложение
     app.run()
 
 

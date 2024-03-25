@@ -13,7 +13,7 @@ class SupplierResource(Resource):
         return jsonify(
             {'user': supplier.to_dict(
                 only=(
-                    'name', 'payment_account',
+                    'id', 'name', 'payment_account',
                     'address', 'mobile_phone',
                     'email', 'items.id'
                 )
@@ -38,7 +38,7 @@ class SupplierListResource(Resource):
         return jsonify({
             'suppliers': [
                 item.to_dict(only=(
-                    'name', 'payment_account',
+                    'id', 'name', 'payment_account',
                     'mobile_phone'
                 ))
                 for item in suppliers

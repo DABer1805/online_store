@@ -13,9 +13,9 @@ class Item(SqlAlchemyBase, SerializerMixin):
     # Название товара
     name = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     # Цена товара
-    price = sqlalchemy.Column(sqlalchemy.Integer, nullable=True)
+    price = sqlalchemy.Column(sqlalchemy.Float, nullable=True)
     # Скидка на товар
-    discount = sqlalchemy.Column(sqlalchemy.Integer, nullable=True)
+    discount = sqlalchemy.Column(sqlalchemy.Float, nullable=True)
     # ID поставщика
     supplier = sqlalchemy.Column(sqlalchemy.Integer,
                                  sqlalchemy.ForeignKey('suppliers.id'))

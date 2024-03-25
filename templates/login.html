@@ -5,9 +5,9 @@
     <form action="" method="post">
         {{ form.hidden_tag() }}
         <p>
-            {{ form.email.label }}<br>
-            {{ form.email(class="form-control", type="email") }}<br>
-            {% for error in form.email.errors %}
+            {{ form.mobile_phone.label }}<br>
+            {{ form.mobile_phone(class="form-control", type="tel") }}<br>
+            {% for error in form.mobile_phone.errors %}
                 <div class="alert alert-danger" role="alert">
                     {{ error }}
                 </div>
@@ -24,6 +24,6 @@
         </p>
         <p>{{ form.remember_me() }} {{ form.remember_me.label }}</p>
         <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
-        <div>{{ message }}</div>
+        <div div class="alert alert-warning" role="alert">{{ message }}</div>
     </form>
 {% endblock %}
