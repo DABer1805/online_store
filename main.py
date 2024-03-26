@@ -2,7 +2,7 @@ from flask import Flask, render_template, redirect, request, url_for
 from flask_restful import Api
 from requests import get, post
 
-from api import calculate_cost_api
+from api import calculate_cost_api, user_basket_api, add_item_to_basket_api
 from data.constants import DB_NAME, MAX_PRICE
 from data import db_session
 from resources import orders_resources, users_resources, items_resources, \
@@ -13,7 +13,7 @@ from data.users import User
 from forms.user import LoginForm, RegisterForm
 
 from flask_login import LoginManager, login_user, login_required, \
-    logout_user
+    logout_user, current_user
 
 # Задаем конфигурацию приложения
 app = Flask(__name__)
@@ -185,11 +185,23 @@ def catalog():
             f'/catalog?cat={",".join(request.form.getlist("cat"))}&'
             f'max_price={request.form.get("price_range")}'
         )
+    # Проверяем, авторизован ли пользователь, и если да, то получаем список
+    # тех товаров, которые он выбрал
+    if current_user.is_authenticated:
+        items_list = current_user.items_list
+    else:
+        items_list = ''
+    # Получаем список товаров, которые лежат в корзине пользователя,
+    # включая количество товаров
+    user_basket = get(
+        'http://localhost:5000/api/user_basket',
+        params={'items_list': items_list}
+    ).json()['items']
     # Получаем список всех товаров с учетом параметров
     items = get(
         'http://localhost:5000/api/items', params=params
     ).json()['items']
-    # Получчаем список всех категорий
+    # Получаем список всех категорий
     categories = get(
         'http://localhost:5000/api/categories'
     ).json()['items']
@@ -197,7 +209,7 @@ def catalog():
     return render_template(
         "items_list.html", title='Продуктовый рай', cur_price=cur_price,
         checked_buttons=checked_buttons, items=items, categories=categories,
-        max_price=MAX_PRICE
+        max_price=MAX_PRICE, user_basket=user_basket
     )
 
 
@@ -206,6 +218,10 @@ def main():
     db_session.global_init(f'db/{DB_NAME}')
     # Подключаем api подсчета цены покупки
     app.register_blueprint(calculate_cost_api.blueprint)
+    # Подключаем api получения товаров из корзины
+    app.register_blueprint(user_basket_api.blueprint)
+    # Подключаем api добавления товара в корзину
+    app.register_blueprint(add_item_to_basket_api.blueprint)
     # Запускаем предложение
     app.run()
 

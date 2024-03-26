@@ -116,6 +116,11 @@ h4 {
 	margin-left: 10px;
 }
 
+.basket_img {
+    max-width: 50px;
+    max-height: 80px;
+}
+
 #item_filter_button {
     margin-top: 20px;
 }
