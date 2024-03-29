@@ -121,6 +121,28 @@ h4 {
     max-height: 80px;
 }
 
+.add_amount_btn {
+    font-size: 15px;
+	color: #999;
+	height: 44px;
+}
+
+.del_amount_btn {
+    font-size: 15px;
+	color: #999;
+	height: 44px;
+}
+
 #item_filter_button {
     margin-top: 20px;
+}
+
+.noselect {
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Old versions of Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-prefixed version, currently
+                        supported by Chrome, Edge, Opera and Firefox */
 }

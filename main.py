@@ -1,8 +1,10 @@
-from flask import Flask, render_template, redirect, request, url_for
+from flask import Flask, render_template, redirect, request
+from flask_cors import CORS, cross_origin
 from flask_restful import Api
 from requests import get, post
 
-from api import calculate_cost_api, user_basket_api, add_item_to_basket_api
+from api import calculate_cost_api, user_basket_api, add_item_to_basket_api, \
+    del_item_in_basket_api
 from data.constants import DB_NAME, MAX_PRICE
 from data import db_session
 from resources import orders_resources, users_resources, items_resources, \
@@ -17,6 +19,8 @@ from flask_login import LoginManager, login_user, login_required, \
 
 # Задаем конфигурацию приложения
 app = Flask(__name__)
+cors = CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
 app.config['SECRET_KEY'] = SECRET_KEY
 api = Api(app)
 
@@ -57,6 +61,15 @@ api.add_resource(suppliers_resources.SupplierResource,
 
 login_manager = LoginManager()
 login_manager.init_app(app)
+
+# Подключаем api подсчета цены покупки
+app.register_blueprint(calculate_cost_api.blueprint)
+# Подключаем api получения товаров из корзины
+app.register_blueprint(user_basket_api.blueprint)
+# Подключаем api добавления товара в корзину
+app.register_blueprint(add_item_to_basket_api.blueprint)
+# Подключаем api удаление товара из корзины
+app.register_blueprint(del_item_in_basket_api.blueprint)
 
 
 @app.route('/logout')
@@ -154,6 +167,7 @@ def reqister():
 
 
 @app.route("/catalog", methods=['GET', 'POST'])
+@cross_origin()
 def catalog():
     """ Каталог с товарами """
     # Параметры
@@ -216,12 +230,6 @@ def catalog():
 def main():
     # Устанавливаем соедениние с БД
     db_session.global_init(f'db/{DB_NAME}')
-    # Подключаем api подсчета цены покупки
-    app.register_blueprint(calculate_cost_api.blueprint)
-    # Подключаем api получения товаров из корзины
-    app.register_blueprint(user_basket_api.blueprint)
-    # Подключаем api добавления товара в корзину
-    app.register_blueprint(add_item_to_basket_api.blueprint)
     # Запускаем предложение
     app.run()
 
