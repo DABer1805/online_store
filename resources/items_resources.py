@@ -33,12 +33,16 @@ class ItemsListResource(Resource):
     def get(self):
         categories = request.args.get('cat')
         max_price = request.args.get('max_price')
+        only_discount = request.args.get('only_discount')
         if max_price is None:
             max_price = MAX_PRICE
         else:
             max_price = float(max_price)
+
         session = db_session.create_session()
-        if categories:
+        if only_discount:
+            items = session.query(Item).filter(Item.discount > 0)
+        elif categories:
             categories = list(map(int, categories.split(',')))
             items = session.query(Item).filter(
                 Item.category.in_(categories),

@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="container-fluid my-carousel">
+		<div id="carouselExampleIndicators" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="5000">
+			<div class="carousel-indicators">
+				{% for item in slides %}
+					{% if loop.first %}
+						<button type="button"
+								data-bs-target="#carouselExampleIndicators"
+								data-bs-slide-to="0" class="active"
+								aria-current="true"
+								aria-label="Slide {{ loop.index0 }}">
+						</button>
+					{% else %}
+						<button type="button"
+								data-bs-target="#carouselExampleIndicators"
+								data-bs-slide-to="{{ loop.index0 }}"
+								aria-label="Slide {{ loop.index0 }}">
+						</button>
+					{% endif %}
+				{% endfor %}
+			</div>
+			<div class="carousel-inner">
+				{% for item in slides %}
+					{% if loop.first %}
+						<div class="carousel-item active" data-bs-interval="3000">
+							<img src="/static/img/slides/special_offer_0.png" class="d-block w-100">
+						</div>
+					{% else %}
+						<div class="carousel-item" data-bs-interval="3000">
+							<img src="/static/img/slides/special_offer_{{ loop.index0 }}.png" class="d-block w-100">
+						</div>
+					{% endif %}
+				{% endfor %}
+			</div>
+			<button class="carousel-control-prev" type="button"
+					data-bs-target="#carouselExampleIndicators"
+					data-bs-slide="prev">
+				<span class="carousel-control-prev-icon" aria-hidden="true"></span>
+				<span class="visually-hidden">Previous</span>
+			</button>
+			<button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+				<span class="carousel-control-next-icon" aria-hidden="true"></span>
+				<span class="visually-hidden">Next</span>
+			</button>
+		</div>
+	</div>
+	<h2>Каталог</h2>
+	<div class="container">
+		<div class="row">
+			{% for item in categories %}
+				<div class="col-lg-4 col-md-6 col-sm-12">
+					<div class="product-card">
+						<div class="catalog-title">
+							<h3>{{ item['name'] }}</h3>
+						</div>
+						<div class="product-thumb">
+							<a href="{{ item['link'] }}"><img src="/static/img/home_page/cat_{{ loop.index }}.png"></a>
+						</div>
+					</div>
+				</div>
+			{% endfor %}
+		</div>
+	</div>
+	<h2>Товары со скидками</h2>
+	<div class="container">
+		<div id="discountedProducts" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
+			<div class="carousel-inner">
+				{% set iters_amount = (discounted_items|length / 3)|round(0, 'ceil')|int %}
+				{% set last_row = 3 - (iters_amount * 3 - discounted_items|length) %}
+				{% for i in range(iters_amount) %}
+					<div class="{{ 'carousel-item active' if loop.first else 'carousel-item' }}">
+						<div class="row">
+							<!-- Сколько итераций делать на последней строке карусели -->
+							{% if loop.last %}
+								{% set row_iters_amount = last_row %}
+							{% else %}
+								{% set row_iters_amount = 3 %}
+							{% endif %}
+
+							{% for j in range(row_iters_amount) %}
+								{% set item = discounted_items[i * 3 + j] %}
+								<div class="col-lg-4 col-md-6 col-sm-12">
+									<div class="product-card">
+										<div class="product-thumb">
+											<a href="#"><img src="/static/img/items/item{{ item['id'] }}.png"></a>
+										</div>
+										<div class="product-details">
+											<h4><a href="#">{{ item['name'] }}</a></h4>
+											<div class="product-bottom-details d-flex justify-content-between">
+												<div class="product-price">
+													{% if item['discount'] == 0 %}
+														{{ item['price'] }}₽
+													{% else %}
+														{% set new_price = item['price'] * (1 - item['discount'] * 0.01) %}
+														{{ new_price|round(2) }}₽ <small>{{ item['price'] }}₽</small>
+													{% endif %}
+												</div>
+												<div class="product-links">
+													{% if current_user.is_authenticated %}
+														<a class="add_item_button" id="item{{ item['id'] }}"><i class="fas fa-shopping-cart"></i></a>
+													{% else %}
+														<a href="/login"><i class="fas fa-shopping-cart"></i></a>
+													{% endif %}
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							{% endfor %}
+						</div>
+					</div>
+				{% endfor %}
+			</div>
+			<button class="carousel-control-prev" type="button" data-bs-target="#discountedProducts" data-bs-slide="prev">
+				<span class="carousel-control-prev-icon" aria-hidden="true"></span>
+				<span class="visually-hidden">Previous</span>
+			</button>
+			<button class="carousel-control-next" type="button" data-bs-target="#discountedProducts" data-bs-slide="next">
+				<span class="carousel-control-next-icon" aria-hidden="true"></span>
+				<span class="visually-hidden">Next</span>
+			</button>
+		</div>
+	</div>
+{% endblock %}

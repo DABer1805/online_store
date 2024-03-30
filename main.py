@@ -1,11 +1,13 @@
-from flask import Flask, render_template, redirect, request
+import os
+
+from flask import Flask, render_template, redirect, request, url_for
 from flask_cors import CORS, cross_origin
 from flask_restful import Api
 from requests import get, post
 
 from api import calculate_cost_api, user_basket_api, add_item_to_basket_api, \
     del_item_in_basket_api
-from data.constants import DB_NAME, MAX_PRICE
+from data.constants import DB_NAME, MAX_PRICE, CATEGORIES
 from data import db_session
 from resources import orders_resources, users_resources, items_resources, \
     categories_resources, suppliers_resources
@@ -78,7 +80,7 @@ def logout():
     """ Выход из профиля """
     logout_user()
     # Перевод на страницу с выбором продуктов
-    return redirect("catalog")
+    return redirect("/")
 
 
 @login_manager.user_loader
@@ -224,6 +226,18 @@ def catalog():
         "items_list.html", title='Продуктовый рай', cur_price=cur_price,
         checked_buttons=checked_buttons, items=items, categories=categories,
         max_price=MAX_PRICE, user_basket=user_basket
+    )
+
+
+@app.route("/")
+def home_page():
+    slides = os.listdir(url_for("static", filename="img/slides")[1:])
+    discounted_items = get(
+        'http://localhost:5000/api/items', params={'only_discount': True}
+    ).json()['items']
+    return render_template(
+        "index.html", title='Продуктовый рай', slides=slides,
+        categories=CATEGORIES, discounted_items=discounted_items
     )
 
 

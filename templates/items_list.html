@@ -56,7 +56,11 @@
                                                 {% endif %}
                                             </div>
                                             <div class="product-links">
-                                                <a class="add_item_button" id="item{{ item['id'] }}"><i class="fas fa-shopping-cart"></i></a>
+                                                {% if current_user.is_authenticated %}
+                                                    <a class="add_item_button" id="item{{ item['id'] }}"><i class="fas fa-shopping-cart"></i></a>
+                                                {% else %}
+                                                    <a href="/login"><i class="fas fa-shopping-cart"></i></a>
+                                                {% endif %}
                                             </div>
                                         </div>
                                     </div>
