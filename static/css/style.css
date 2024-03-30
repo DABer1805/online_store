@@ -27,6 +27,18 @@ h4 {
 	text-transform: uppercase;
 }
 
+.my-carousel {
+	padding: 0;
+}
+
+.my-carousel .carousel-item {
+	display: flex;
+}
+
+.my-carousel .carousel-item img {
+	object-fit: cover;
+}
+
 .navbar-nav .dropdown-menu {
 	right: 0;
 	left: auto;
@@ -70,10 +82,16 @@ h4 {
 .product-thumb img {
 	max-width: 100%;
 	max-height: 100%;
+	margin-bottom: 20px;
 }
 
 .product-details {
 	padding: 20px;
+}
+
+.catalog-title {
+    padding: 20px;
+    font-color: #111;
 }
 
 .product-details h4 a {
@@ -145,4 +163,29 @@ h4 {
   -ms-user-select: none; /* Internet Explorer/Edge */
   user-select: none; /* Non-prefixed version, currently
                         supported by Chrome, Edge, Opera and Firefox */
+}
+
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+  height: 50px;
+  width: 50px;
+  outline: black;
+  background: #fff;
+  background-size: 100%, 100%;
+  border-radius: 50%;
+  border: 1px solid black;
+  background-image: none;
+}
+
+.carousel-control-next-icon:after
+{
+  content: '>';
+  font-size: 29px;
+  color: black;
+}
+
+.carousel-control-prev-icon:after {
+  content: '<';
+  font-size: 29px;
+  color: black;
 }
