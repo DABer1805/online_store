@@ -1,75 +1,101 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <div class="row">
-        <div class="col-3">
-            <form class="item_filter_form" method="post">
-                <h2>Каталог</h2>
-                <div class="d-flex flex-column h-25">
-                    <div style="height: 300px; overflow-x: hidden; overflow-y: scroll">
-                        {% for item in categories %}
-                            <div class="form-check">
-                                {% if item['id'] in checked_buttons %}
-                                    <input class="form-check-input" type="checkbox" value="{{ item['id'] }}" id="cat{{ item['id'] }}" name="cat" checked>
-                                {% else %}
-                                    <input class="form-check-input" type="checkbox" value="{{ item['id'] }}" id="cat{{ item['id'] }}" name="cat">
-                                {% endif %}
-                                <label class="form-check-label" for="cat{{ item['id'] }}">
-                                  {{ item['name'] }}
-                                </label>
-                            </div>
-                        {% endfor %}
-                    </div>
-                    <label for="price_range" class="form-label" style="margin-top: 20px">Максимальная цена:
-                        <span id="price_text">{{ cur_price }}</span>₽
-                    </label>
-                    <input type="range" class="form-range" min="0" max="{{ max_price }}"
-                           name="price_range" value="{{ cur_price }}" step="0.5"
-                           id="price_range">
-                    <button type="submit" class="btn btn-primary" id="item_filter_button">
-                        Показать товары
-                    </button>
-                </div>
-            </form>
+    <div class="container">
+        <div class="row">
+            <div class="col-12 breadcrumb-container">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Главная</a></li>
+                    {% if cat_filters %}
+                        <li class="breadcrumb-item"><a href="/catalog">Каталог</a></li>
+                        <li class="breadcrumb-item active">{{ cat_filters }}</li>
+                    {% else %}
+                        <li class="breadcrumb-item active">Каталог</li>
+                    {% endif %}
+                </ol>
+            </div>
         </div>
-        <div class="col-9">
-            <div id="message_container"></div>
-            <h1 style="text-align: center">Список товаров</h1>
-            <div class="container">
-                <div class="row">
-                    {% if items|length > 0 %}
-                        {% for item in items %}
-                            <div class="col-lg-4 col-md-6 col-sm-12">
-                                <div class="product-card">
-                                    <div class="product-thumb">
-                                        <a href="#"><img src="/static/img/items/item{{ item['id'] }}.png"></a>
-                                    </div>
-                                    <div class="product-details">
-                                        <h4><a href="#">{{ item['name'] }}</a></h4>
-                                        <div class="product-bottom-details d-flex justify-content-between">
-                                            <div class="product-price">
-                                                {% if item['discount'] == 0 %}
-                                                    {{ item['price'] }}₽
-                                                {% else %}
-                                                    {% set new_price = item['price'] * (1 - item['discount'] * 0.01) %}
-                                                    {{ new_price|round(2) }}₽ <small>{{ item['price'] }}₽</small>
-                                                {% endif %}
-                                            </div>
-                                            <div class="product-links">
-                                                {% if current_user.is_authenticated %}
-                                                    <a class="add_item_button" id="item{{ item['id'] }}"><i class="fas fa-shopping-cart"></i></a>
-                                                {% else %}
-                                                    <a href="/login"><i class="fas fa-shopping-cart"></i></a>
-                                                {% endif %}
+        <div class="row">
+            <div class="col-12 return-to-catalog">
+                <a href="{{ '/catalog' if cat_filters else '/'}}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-double-left" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M8.354 1.646a.5.5 0 0 1 0 .708L2.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"/>
+                        <path fill-rule="evenodd" d="M12.354 1.646a.5.5 0 0 1 0 .708L6.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"/>
+                    </svg>
+                </a>
+                <a href="{{ '/catalog' if cat_filters else '/'}}">Обратно</a>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3 col-sm-12">
+                <form class="item_filter_form" method="post">
+                    <h2>Каталог</h2>
+                    <div class="d-flex flex-column h-25">
+                        <div style="height: 300px; overflow-x: hidden; overflow-y: scroll">
+                            {% for item in categories %}
+                                <div class="form-check">
+                                    {% if item['id'] in checked_buttons %}
+                                        <input class="form-check-input" type="checkbox" value="{{ item['id'] }}" id="cat{{ item['id'] }}" name="cat" checked>
+                                    {% else %}
+                                        <input class="form-check-input" type="checkbox" value="{{ item['id'] }}" id="cat{{ item['id'] }}" name="cat">
+                                    {% endif %}
+                                    <label class="form-check-label" for="cat{{ item['id'] }}">
+                                      {{ item['name'] }}
+                                    </label>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        <label for="price_range" class="form-label" style="margin-top: 20px">Максимальная цена:
+                            <span id="price_text">{{ cur_price }}</span>₽
+                        </label>
+                        <input type="range" class="form-range" min="0" max="{{ max_price }}"
+                               name="price_range" value="{{ cur_price }}" step="0.5"
+                               id="price_range">
+                        <button type="submit" class="btn btn-primary" id="item_filter_button">
+                            Показать товары
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <div class="col-md-9 col-sm-12">
+                <div id="message_container"></div>
+                <h1 style="text-align: center">Список товаров</h1>
+                <div class="container">
+                    <div class="row">
+                        {% if items|length > 0 %}
+                            {% for item in items %}
+                                <div class="col-lg-4 col-md-6 col-sm-12">
+                                    <div class="product-card">
+                                        <div class="product-thumb">
+                                            <a href="/catalog/{{ item['id'] }}?cat={{ checked_buttons|join(',') }}&max_price={{ max_price }}"><img src="/static/img/items/item{{ item['id'] }}.png"></a>
+                                        </div>
+                                        <div class="product-details">
+                                            <h4><a href="/catalog/{{ item['id'] }}?cat={{ checked_buttons|join(',') }}&max_price={{ max_price }}">{{ item['name'] }}</a></h4>
+                                            <div class="product-bottom-details d-flex justify-content-between">
+                                                <div class="product-price">
+                                                    {% if item['discount'] == 0 %}
+                                                        {{ item['price'] }}₽
+                                                    {% else %}
+                                                        {% set new_price = item['price'] * (1 - item['discount'] * 0.01) %}
+                                                        {{ new_price|round(2) }}₽ <small>{{ item['price'] }}₽</small>
+                                                    {% endif %}
+                                                </div>
+                                                <div class="product-links">
+                                                    {% if current_user.is_authenticated %}
+                                                        <a class="add_item_button" id="item{{ item['id'] }}"><i class="fas fa-shopping-cart"></i></a>
+                                                    {% else %}
+                                                        <a href="/login"><i class="fas fa-shopping-cart"></i></a>
+                                                    {% endif %}
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        {% endfor %}
-                    {% else %}
-                        <h3 style="text-align: center; color: grey">Товары не найдены</h3>
-                    {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            <h3 style="text-align: center; color: grey">Товары не найдены</h3>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
         </div>

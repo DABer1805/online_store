@@ -189,3 +189,161 @@ h4 {
   font-size: 29px;
   color: black;
 }
+
+.item_img {
+    position: relative;
+    max-width: 70%;
+    max-height: 400px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%);
+}
+
+
+.item_title {
+    padding-top: 20px;
+}
+
+.product-price-item {
+    margin-top: 20px;
+    padding: 20px;
+	font-size: 22px;
+	color: #ee6e73;
+	font-weight: 600;
+}
+
+.product-price-item small {
+    color: #ccc;
+	font-weight: 400;
+	text-decoration: line-through;
+	margin-right: 5px;
+}
+
+.return-to-catalog {
+	height: 60px;
+}
+
+.return-to-catalog a {
+    color: black;
+    font-size: 18px;
+    font-weight: 450;
+	text-decoration: none;
+}
+
+.return-to-catalog svg {
+    width: 22px;
+    height: 22px;
+}
+
+.breadcrumb-container {
+    padding-top: 20px;
+}
+
+.breadcrumb-container a {
+    text-decoration: none;
+}
+
+.breadcrumb-item a {
+    color: #a1a1a1;
+}
+
+.breadcrumb-item active a {
+    color: #d2d2d2;
+}
+
+.item-tabs {
+    padding-top: 60px;
+}
+
+.item-tab-content {
+    padding: 20px;
+}
+
+.nutritional-value-table {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: justify;
+    -ms-flex-pack: justify;
+    justify-content: space-between;
+    height: 80px;
+    padding: 12px;
+    border: 1px solid #ededed;
+    border-radius: 16px;
+    margin-top: 16px;
+}
+
+.nutritional-value-table-item {
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    padding: 0;
+    width: 103px;
+    text-align: center;
+}
+
+.nutritional-value-table-count {
+    font-size: 20px;
+	color: #000000;
+	font-weight: 600;
+}
+
+.feature-title:after {
+    margin: 0 0 4px 8px;
+    content: '';
+    -webkit-box-flex: 1;
+    -ms-flex: 1;
+    flex: 1;
+    border-bottom: 1px dotted #e7e7e7;
+}
+
+.feature-title {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    font-weight: 400;
+    font-size: 14px;
+    color: #717171;
+    overflow: hidden;
+}
+
+.feature-table-cell {
+    display: grid;
+    grid-template-columns: 60% 60%;
+    grid-column-gap: 8px;
+    line-height: 20px;
+    padding-top: 4px;
+    -webkit-box-align: start;
+    -ms-flex-align: start;
+    align-items: start;
+}
+
+.features-table {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    margin-bottom: 30px;
+    gap: 8px;
+    word-break: keep-all;
+}
+
+.item-img-container {
+    height: fit-content;
+}
+
+::selection {
+    background-color: #82dd47;
+    color: #fff;
+}
+
+header {
+    margin-bottom: 70px;
+}

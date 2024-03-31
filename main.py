@@ -185,12 +185,18 @@ def catalog():
     if cur_price is None:
         # Устанавливаем цену как максимальную
         cur_price = MAX_PRICE
+    cat_filters = None
     # Если категории переданы через параметры
     if cat:
         # Устанавливаем в параметрах эти категории
         params['cat'] = cat
         # Добавляем в список нажатых кнопок эти категории
         checked_buttons += list(map(int, cat.split(',')))
+        cat_filters = ', '.join(
+            map(lambda x: get(
+                f'http://localhost:5000/api/categories/{x}'
+            ).json()['name'], cat.split(','))
+        )
     # Устанавливаем в параметрах ограничение по цене - текущую цену на
     # слайдере
     params['max_price'] = cur_price
@@ -225,7 +231,49 @@ def catalog():
     return render_template(
         "items_list.html", title='Продуктовый рай', cur_price=cur_price,
         checked_buttons=checked_buttons, items=items, categories=categories,
-        max_price=MAX_PRICE, user_basket=user_basket
+        cat_filters=cat_filters, max_price=MAX_PRICE, user_basket=user_basket
+    )
+
+
+@app.route("/catalog/<int:item_id>")
+def item_page(item_id):
+    # Получаем инфо о выбранном предмете
+    item = get(f'http://localhost:5000/api/items/{item_id}').json()['item']
+    # Категории предыдущей страницы каталога
+    cat = request.args.get('cat')
+    # Если открыта страница товара не из каталога
+    anchor = request.args.get('anchor')
+    # Максимальная цена фильтра каталога при открытии страницы товара
+    max_price = request.args.get('max_price')
+    # ЕСли параметр максимальной цены не передан, то устанавливаем дефолтное
+    if max_price is None:
+        max_price = MAX_PRICE
+    # Если переданы категории предыдущей страницы каталога
+    if cat:
+        categories = {
+            'names': ', '.join(map(lambda x: get(
+                f'http://localhost:5000/api/categories/{x}'
+            ).json()['name'], cat.split(','))),
+            'ids': cat
+        }
+    else:
+        categories = {}
+    # Проверяем, авторизован ли пользователь, и если да, то получаем список
+    # тех товаров, которые он выбрал
+    if current_user.is_authenticated:
+        items_list = current_user.items_list
+    else:
+        items_list = ''
+    # Получаем список товаров, которые лежат в корзине пользователя,
+    # включая количество товаров
+    user_basket = get(
+        'http://localhost:5000/api/user_basket',
+        params={'items_list': items_list}
+    ).json()['items']
+    return render_template(
+        "item_page.html", title='Продуктовый рай', item=item,
+        categories=categories, max_price=max_price, anchor=anchor,
+        user_basket=user_basket
     )
 
 
@@ -235,9 +283,22 @@ def home_page():
     discounted_items = get(
         'http://localhost:5000/api/items', params={'only_discount': True}
     ).json()['items']
+    # Проверяем, авторизован ли пользователь, и если да, то получаем список
+    # тех товаров, которые он выбрал
+    if current_user.is_authenticated:
+        items_list = current_user.items_list
+    else:
+        items_list = ''
+    # Получаем список товаров, которые лежат в корзине пользователя,
+    # включая количество товаров
+    user_basket = get(
+        'http://localhost:5000/api/user_basket',
+        params={'items_list': items_list}
+    ).json()['items']
     return render_template(
         "index.html", title='Продуктовый рай', slides=slides,
-        categories=CATEGORIES, discounted_items=discounted_items
+        categories=CATEGORIES, discounted_items=discounted_items,
+        user_basket=user_basket
     )
 
 

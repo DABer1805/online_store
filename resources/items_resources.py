@@ -11,12 +11,18 @@ class ItemsResource(Resource):
         abort_if_item_not_found(item_id)
         session = db_session.create_session()
         item = session.query(Item).get(item_id)
-        return jsonify(
-            {'item': item.to_dict(only=(
+        data = {
+            'item': item.to_dict(only=(
                 'id', 'name', 'price', 'discount',
-                'supplier', 'category'
-            ))}
-        )
+                'category', 'brand', 'type', 'type_of_packing',
+                'width', 'height', 'depth', 'weight',
+                'capacity', 'min_temp', 'max_temp',
+                'expiration_date', 'calories', 'squirrels',
+                'fats', 'carbohydrates', 'description', 'composition'
+            ))
+        }
+        data['item']['supplier'] = item.suppliers.name
+        return jsonify(data)
 
     def delete(self, item_id):
         abort_if_item_not_found(item_id)
