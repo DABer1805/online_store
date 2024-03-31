@@ -15,7 +15,7 @@ class CategoriesResource(Resource):
         category = session.query(Category).get(category_id)
         # Возвращаем информацию о категории в json формате
         return jsonify(
-            {'categories': category.to_dict(only=('id', 'name', 'items.id'))}
+            category.to_dict(only=('id', 'name', 'items.id'))
         )
 
     def delete(self, category_id):

@@ -64,6 +64,7 @@
 		</div>
 	</div>
 	<h2>Товары со скидками</h2>
+	<div id="message_container"></div>
 	<div class="container">
 		<div id="discountedProducts" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
 			<div class="carousel-inner">
@@ -84,10 +85,10 @@
 								<div class="col-lg-4 col-md-6 col-sm-12">
 									<div class="product-card">
 										<div class="product-thumb">
-											<a href="#"><img src="/static/img/items/item{{ item['id'] }}.png"></a>
+											<a href="/catalog/{{ item['id'] }}?anchor=Главная"><img src="/static/img/items/item{{ item['id'] }}.png"></a>
 										</div>
 										<div class="product-details">
-											<h4><a href="#">{{ item['name'] }}</a></h4>
+											<h4><a href="/catalog/{{ item['id'] }}?anchor=Главная">{{ item['name'] }}</a></h4>
 											<div class="product-bottom-details d-flex justify-content-between">
 												<div class="product-price">
 													{% if item['discount'] == 0 %}

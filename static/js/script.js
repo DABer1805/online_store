@@ -29,8 +29,10 @@ function addItemToBasket(itemId) {
         // Обращаемся к контейнеру для сообщений
         var messageContainer = document.getElementById("message_container");
         // Сообщение о добавлении товара в корзину
-        var messageDiv = `<div class="alert alert-success" role="alert" \
-        id="add_item_message">Товар "${itemName}" добавлен в корзину</div>`;
+        var messageDiv = `<div class="alert alert-success alert-dismissible \
+        fade show" role="alert" id="add_item_message">Товар "${itemName}" \
+        добавлен в корзину<button type="button" class="btn-close" \
+        data-bs-dismiss="alert" aria-label="Close"></button></div>`;
         // Если в контейнере уже есть сообщение, то удаляем его
         if (messageContainer.querySelector('#add_item_message')) {
             messageContainer.innerHTML = "";
@@ -49,9 +51,10 @@ function addItemToBasket(itemId) {
                 <td><img src="/static/img/items/item${itemId}.png" \
                  alt="" class="basket_img"></td> \
                 <td><a href="#">${itemName}</a></td> \
-                <td id="item${itemId}_price">${itemPrice}₽</td> \
+                <td id="item${itemId}_price"> \
+                ${(Math.round(itemPrice * 100) / 100)}₽</td> \
                 <td id="item${itemId}_total_price"> \
-                ${itemPrice * itemAmount}₽</td> \
+                ${(Math.round(itemPrice * itemAmount * 100) / 100)}₽</td> \
                 <td id="item${itemId}_amount"> \
                 <a class="del_amount_btn" id="del_amount${itemId}"> \
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" \
@@ -150,9 +153,10 @@ function delItemInBasket(itemId) {
             "message_container"
         );
         // Сообщение об удалении товара из корзины
-        var messageDiv = `<div class="alert alert-danger" role="alert" \
-        id="add_item_message">Товар "${itemName}" удалён из \
-        корзины</div>`;
+        var messageDiv = `<div class="alert alert-danger alert-dismissible \
+        fade show" role="alert" id="add_item_message">Товар "${itemName}" \
+        удалён из корзины<button type="button" class="btn-close" \
+        data-bs-dismiss="alert" aria-label="Close"></button></div>`;
         // Если в контейнере уже есть сообщение, то удаляем его
         if (messageContainer.querySelector('#add_item_message')) {
             messageContainer.innerHTML = "";

@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-12 breadcrumb-container">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Главная</a></li>
+                    {% if not anchor %}
+                        <li class="breadcrumb-item"><a href="/catalog">Каталог</a></li>
+                        {% if categories %}
+                            <li class="breadcrumb-item"><a href="/catalog?cat={{ categories['ids'] }}&max_price={{ max_price }}">{{ categories['names'] }}</a></li>
+                        {% endif %}
+                    {% endif %}
+                    <li class="breadcrumb-item active" aria-current="page">{{ item['name'] }}</li>
+                </ol>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 return-to-catalog">
+                {% if anchor %}
+                    <a href="/">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-double-left" viewBox="0 0 16 16">
+                          <path fill-rule="evenodd" d="M8.354 1.646a.5.5 0 0 1 0 .708L2.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"/>
+                          <path fill-rule="evenodd" d="M12.354 1.646a.5.5 0 0 1 0 .708L6.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"/>
+                        </svg>
+                    </a>
+                    <a href="/">Обратно</a>
+                {% else %}
+                    <a href="/catalog?cat={{ categories['ids'] }}&max_price={{ max_price }}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-double-left" viewBox="0 0 16 16">
+                          <path fill-rule="evenodd" d="M8.354 1.646a.5.5 0 0 1 0 .708L2.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"/>
+                          <path fill-rule="evenodd" d="M12.354 1.646a.5.5 0 0 1 0 .708L6.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"/>
+                        </svg>
+                    </a>
+                    <a href="/catalog?cat={{ categories['ids'] }}&max_price={{ max_price }}">Обратно</a>
+                {% endif %}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 col-sm-12 item-img-container">
+                <img src="/static/img/items/item{{ item['id'] }}.png" class="item_img">
+            </div>
+            <div class="col-md-6 col-sm-12">
+                <h2 class="item_title">{{ item['name'] }}</h2>
+                <div class="product-price-item border rounded">
+                    {% if item['discount'] == 0 %}
+                    {{ item['price'] }}₽
+                    {% else %}
+                    {% set new_price = item['price'] * (1 - item['discount'] * 0.01) %}
+                    {{ new_price|round(2) }}₽ <small>{{ item['price'] }}₽</small>
+                    {% endif %}
+                </div>
+                <ul class="nav nav-tabs item-tabs" id="myTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="specifications-tab" data-bs-toggle="tab" data-bs-target="#specifications" type="button" role="tab" aria-controls="home" aria-selected="true">Характеристики</button>
+                    </li>
+                    {% if item['description'] %}
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="description-tab" data-bs-toggle="tab" data-bs-target="#description" type="button" role="tab" aria-controls="description" aria-selected="false">Описание</button>
+                        </li>
+                    {% endif %}
+                    {% if item['composition'] %}
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="composition-tab" data-bs-toggle="tab" data-bs-target="#composition" type="button" role="tab" aria-controls="composition" aria-selected="false">Состав</button>
+                        </li>
+                    {% endif %}
+                </ul>
+
+                <div class="tab-content item-tab-content">
+                    <div class="tab-pane active" id="specifications" role="tabpanel" aria-labelledby="specifications-tab">
+                        {% if (item['calories'], item['squirrels'], item['fats'], item['carbohydrates'])|select|first %}
+                            <h5>Пищевая ценность в 100 граммах</h5>
+                            <div class="nutritional-value-table">
+                                <div class="nutritional-value-table-item">
+                                    <div class="nutritional-value-table-count">
+                                        {% if item['calories'] %}
+                                            {{ item['calories'] }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </div>
+                                    <div class="nutritional-value-table-text">
+                                        ккал
+                                    </div>
+                                </div>
+                                <div class="nutritional-value-table-item">
+                                    <div class="nutritional-value-table-count">
+                                        {% if item['squirrels'] %}
+                                            {{ item['squirrels'] }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </div>
+                                    <div class="nutritional-value-table-text">
+                                        белки
+                                    </div>
+                                </div>
+                                <div class="nutritional-value-table-item">
+                                    <div class="nutritional-value-table-count">
+                                        {% if item['fats'] %}
+                                            {{ item['fats'] }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </div>
+                                    <div class="nutritional-value-table-text">
+                                        жиры
+                                    </div>
+                                </div>
+                                 <div class="nutritional-value-table-item">
+                                    <div class="nutritional-value-table-count">
+                                        {% if item['carbohydrates'] %}
+                                            {{ item['carbohydrates'] }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </div>
+                                    <div class="nutritional-value-table-text">
+                                        углеводы
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                        <h5 style="padding-top: 20px">Характеристики</h5>
+                        <div class="features-table">
+                            {% if item['brand'] %}
+                                <div class="feature-table-cell">
+                                    <div class="feature-title">Бренд</div>
+                                    <div>{{ item['brand'] }}</div>
+                                </div>
+                            {% endif %}
+                            {% if item['supplier'] %}
+                                <div class="feature-table-cell">
+                                    <div class="feature-title">Производитель</div>
+                                    <div>{{ item['supplier'] }}</div>
+                                </div>
+                            {% endif %}
+                            {% if item['type'] %}
+                                <div class="feature-table-cell">
+                                    <div class="feature-title">Вид продукта</div>
+                                    <div>{{ item['type'] }}</div>
+                                </div>
+                            {% endif %}
+                            {% if item['type_of_packing'] %}
+                                <div class="feature-table-cell">
+                                    <div class="feature-title">Тип упаковки</div>
+                                    <div>{{ item['type_of_packing'] }}</div>
+                                </div>
+                            {% endif %}
+                            {% if item['width'] %}
+                                <div class="feature-table-cell">
+                                    <div class="feature-title">Ширина, см</div>
+                                    <div>{{ item['width'] }}</div>
+                                </div>
+                            {% endif %}
+                            {% if item['height'] %}
+                                <div class="feature-table-cell">
+                                    <div class="feature-title">Высота, см</div>
+                                    <div>{{ item['height'] }}</div>
+                                </div>
+                            {% endif %}
+                            {% if item['depth'] %}
+                                <div class="feature-table-cell">
+                                    <div class="feature-title">Глубина, см</div>
+                                    <div>{{ item['depth'] }}</div>
+                                </div>
+                            {% endif %}
+                            {% if item['capacity'] %}
+                                <div class="feature-table-cell">
+                                    <div class="feature-title">Eмкость, л</div>
+                                    <div>{{ item['capacity'] }}</div>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <h5 style="padding-top: 20px">Условия хранения</h5>
+                        <div class="features-table">
+                            <div class="feature-table-cell">
+                                <div class="feature-title">Мин. температура хранения, °C</div>
+                                <div>{{ item['min_temp'] }}</div>
+                            </div>
+                            <div class="feature-table-cell">
+                                <div class="feature-title">Макс. температура хранения, °C</div>
+                                <div>{{ item['max_temp'] }}</div>
+                            </div>
+                            <div class="feature-table-cell">
+                                <div class="feature-title">Срок годности</div>
+                                <div>{{ item['expiration_date'] }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    {% if item['description'] %}
+                        <div class="tab-pane" id="description" role="tabpanel" aria-labelledby="description-tab">{{ item['description'] }}</div>
+                    {% endif %}
+                    {% if item['composition'] %}
+                        <div class="tab-pane" id="composition" role="tabpanel" aria-labelledby="composition-tab">{{ item['composition'] }}</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        var firstTabEl = document.querySelector('#myTab li:last-child a');
+        var firstTab = new bootstrap.Tab(firstTabEl);
+
+        firstTab.show();
+    </script>
+{% endblock %}
