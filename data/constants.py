@@ -4,6 +4,9 @@ DB_NAME = 'shop.db'
 TEST_DB_NAME = 'shop_test.db'
 # Максимальная цена товара (для слайдера на экране фильтрации)
 MAX_PRICE = 10000
+# Доступные расширения для изображений товара
+ALLOWED_EXTENSIONS = ('png',)
+# Категории товаров
 CATEGORIES = [
     {'name': 'Все товары', 'link': '/catalog'},
     {'name': 'Овощи и фрукты', 'link': '/catalog?cat=3'},
