@@ -1,19 +1,23 @@
 from flask import Flask, render_template, redirect, request, url_for
 from flask_restful import Api
 from requests import get, post
+import os.path
 
 from api import calculate_cost_api
-from data.constants import DB_NAME, MAX_PRICE
+from data.constants import DB_NAME, TEST_DB_NAME, MAX_PRICE, ALLOWED_EXTENSIONS
 from data import db_session
 from resources import orders_resources, users_resources, items_resources, \
     categories_resources, suppliers_resources
 from data.secret_key import SECRET_KEY
 
 from data.users import User
-from forms.user import LoginForm, RegisterForm
+from data.items import Item
+from data.categories import Category
+from forms.user import LoginForm, RegisterForm, AddProductForm, \
+    AddSupplierForm
 
 from flask_login import LoginManager, login_user, login_required, \
-    logout_user
+    logout_user, current_user
 
 # Задаем конфигурацию приложения
 app = Flask(__name__)
@@ -201,9 +205,96 @@ def catalog():
     )
 
 
+@app.route("/add_product", methods=['GET', 'POST'])
+def add_product_page():
+    """Страничка добавления товара"""
+
+    # создание формы добавления товаров
+    form = AddProductForm()
+
+    session = db_session.create_session()
+
+    # Проверка id пользователя (доступ только для id == 1)
+    if int(current_user.get_id()) == 1:
+        # Если нажата кнопка отправки формы
+        if form.validate_on_submit():
+            # Есть ли наше изображение в переданном запросе
+            if 'product_image' in request.files:
+                # Имя файла с изображением
+                image = request.files['product_image']
+                # Проверка формата файла:
+                if image.filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS:
+                    # Определяем имя файла на основе id последнего товара в бд
+                    id_amount = len(session.query(Item.id).all())
+                    filename = f"item{id_amount + 1}.png"
+                    # Здесь указывается путь до папки на сервере,
+                    # где будет сохранен файл
+                    path_to_save = os.path.join('./static/img/items', filename)
+                    image.save(path_to_save)
+                else:
+                    return render_template(
+                        'add_product.html', title="Страница управления", form=form,
+                        message="Недопустимый формат изображения"
+                    )
+            # добавляем товар
+            post(
+                'http://localhost:5000/api/items',
+                json={
+                    "name": form.name.data,
+                    "price": float(form.cost.data),
+                    "discount": int(form.discount.data),
+                    "supplier": 1,
+                    "category": session.query(Category).filter(
+                        Category.name == form.category.data
+                    ).first().id
+                }
+            )
+        # при ошибке ввода цены
+        elif form.cost.data is None and request.files:
+            return render_template(
+                'add_product.html', title="Страница управления", form=form,
+                cost_error=True
+            )
+
+        return render_template(
+            'add_product.html', title="Страница управления", form=form
+        )
+
+
+@app.route("/add_supplier", methods=['GET', 'POST'])
+def add_supplier_page():
+    """Страничка добавления товара"""
+
+    # создание формы добавления товаров
+    form = AddSupplierForm()
+
+    session = db_session.create_session()
+
+    # Проверка id пользователя (доступ только для id == 1)
+    if int(current_user.get_id()) == 1:
+        # Если нажата кнопка отправки формы
+        if form.validate_on_submit():
+
+            # регистрируем поставщика
+            post(
+                'http://localhost:5000/api/suppliers',
+                json={
+                    "name": form.name.data,
+                    "payment_account": form.payment_account.data,
+                    "address": form.payment_account.data,
+                    "mobile_phone": form.mobile_phone.data,
+                    "email": form.email.data
+                }
+            )
+
+        return render_template(
+            'add_supplier.html', title="Регистрация поставщика", form=form
+        )
+
+
 def main():
-    # Устанавливаем соедениние с БД
-    db_session.global_init(f'db/{DB_NAME}')
+    # Устанавливаем соединение с БД
+    db_session.global_init(f'db/{TEST_DB_NAME}')
     # Подключаем api подсчета цены покупки
     app.register_blueprint(calculate_cost_api.blueprint)
     # Запускаем предложение

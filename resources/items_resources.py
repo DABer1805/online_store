@@ -78,8 +78,8 @@ def abort_if_item_not_found(item_id):
 
 
 parser = reqparse.RequestParser()
-parser.add_argument('name', required=True)
-parser.add_argument('price', required=True, type=int)
+parser.add_argument('name', required=True, type=str)
+parser.add_argument('price', required=True, type=float)
 parser.add_argument('discount', required=True, type=int)
 parser.add_argument('supplier', required=True, type=int)
 parser.add_argument('category', required=True, type=int)
