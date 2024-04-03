@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask, render_template, redirect, request, url_for
+from flask import Flask, render_template, redirect, request, url_for, abort
 from flask_cors import CORS, cross_origin
 from flask_restful import Api
 from requests import get, post
@@ -304,6 +304,26 @@ def home_page():
         categories=CATEGORIES, discounted_items=discounted_items,
         user_basket=user_basket
     )
+
+@app.route("/personal_account")
+def personal_account():
+    if current_user.is_authenticated:
+        orders = get(
+            'http://localhost:5000/api/orders',
+            params={'user_id': current_user.id}
+        ).json()['orders']
+
+        for order in orders:
+            order['items_list'] = get(
+                'http://localhost:5000/api/user_basket',
+                params={'items_list': order['items_list']}
+            ).json()['items']
+
+        return render_template(
+            "personal_account.html", title='Продуктовый рай', orders=orders
+        )
+
+    abort(404, message=f"User is not authenticated")
 
 
 @app.route("/add_product", methods=['GET', 'POST'])

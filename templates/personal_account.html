@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+          <div class="col-md-4 col-sm-12">
+              <h2 class="personal_account_title">Мой аккаунт</h2>
+              <div class="list-group" id="list-tab" role="tablist">
+                  <a class="list-group-item list-group-item-action active" id="list-home-list" data-bs-toggle="list" href="#list-home" role="tab" aria-controls="list-home">Мой кабинет</a>
+                  <a class="list-group-item list-group-item-action" id="list-personal-account-list" data-bs-toggle="list" href="#list-personal-account" role="tab" aria-controls="list-personal-account">Личный счёт</a>
+                  <a class="list-group-item list-group-item-action" id="list-personal-data-list" data-bs-toggle="list" href="#list-personal-data" role="tab" aria-controls="list-personal-data">Личные данные</a>
+                  <a class="list-group-item list-group-item-action" id="list-order-history-list" data-bs-toggle="list" href="#list-order-history" role="tab" aria-controls="list-order-history">История заказов</a>
+              </div>
+          </div>
+          <div class="col-md-8 col-sm-12">
+              <h1 class="personal_account_title">Личный кабинет</h1>
+              <div class="tab-content" id="nav-tabContent">
+                  <div class="tab-pane fade show active" id="list-home" role="tabpanel" aria-labelledby="list-home-list">
+                      <div class="container">
+                        <div class="row">
+                            <div class="col-lg-6 col-sm-12">
+                                <div class="product-card" id="personal-account-btn">
+                                    <div class="product-thumb">
+                                        <a><img src="/static/img/personal_account_cards/card_1.png"></a>
+                                    </div>
+                                    <div class="catalog-title">
+                                        <h3>Личный счёт</h3>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-sm-12">
+                                <div class="product-card" id="personal-data-btn">
+                                    <div class="product-thumb">
+                                        <a><img src="/static/img/personal_account_cards/card_2.png"></a>
+                                    </div>
+                                    <div class="catalog-title">
+                                        <h3>Личные данные</h3>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-sm-12">
+                                <div class="product-card" id="order-history-btn">
+                                    <div class="product-thumb">
+                                        <a><img src="/static/img/personal_account_cards/card_3.png"></a>
+                                    </div>
+                                    <div class="catalog-title">
+                                        <h3>История заказов</h3>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                  </div>
+                  <div class="tab-pane fade show" id="list-personal-account" role="tabpanel" aria-labelledby="list-personal-account-list">Личный счёт</div>
+                  <div class="tab-pane fade show" id="list-personal-data" role="tabpanel" aria-labelledby="list-personal-data-list">Личные данные</div>
+                  <div class="tab-pane fade show" id="list-order-history" role="tabpanel" aria-labelledby="list-order-history-list">
+                      {% if orders|length > 0 %}
+                        <h2>Ваши заказы</h2>
+                            {% for order in orders %}
+                                <div class="order-table-container">
+                                    <table class="table table-bordered" style="{{'display: block;' if loop.first else 'display: none;'}}">
+                                        <thead class="table-secondary">
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Дата создания заказа</th>
+                                            <th>Дата завершения заказа</th>
+                                            <th colspan="2">Статус</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <th scope="row">{{ order['id'] }}</th>
+                                                <td>{{ order['start_date'] }}</td>
+                                                <td>{{ order['end_date'] }}</td>
+                                                {% if order['is_complited'] %}
+                                                    <td class="table-success" colspan="2">Завершен</td>
+                                                {% else %}
+                                                    <td class="table-warning" colspan="2">Не завершен</td>
+                                                {% endif %}
+                                            </tr>
+                                        <tr>
+                                          <th class="table-secondary" colspan="5">Список товаров</th>
+                                        </tr>
+                                        <tr class="table-light">
+                                            <th>ID</th>
+                                            <th>Название</th>
+                                            <th>Изображение</th>
+                                            <th>Цена за 1шт</th>
+                                            <th>Количество</th>
+                                        </tr>
+                                        {% for item in order['items_list'] %}
+                                            {% set item_data = item['item'] %}
+                                            {% set amount = item['amount'] %}
+                                            {% set new_price = item_data['price'] * (1 - item_data['discount'] * 0.01) %}
+                                            <tr>
+                                                <td>{{ item_data['id'] }}</td>
+                                                <td>{{ item_data['name'] }}</td>
+                                                <td class="text-center"><img src="/static/img/items/item{{ item_data['id'] }}.png" alt="" class="basket_img"></td>
+                                                <td>{{ new_price|round(2) }}</td>
+                                                <td>{{ amount }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                          {% endfor %}
+                          <nav aria-label="Page navigation example">
+                              <ul class="pagination">
+                                  <li class="page-item">
+                                      <a class="page-link" href="#" aria-label="Previous">
+                                          <span aria-hidden="true">&laquo;</span>
+                                      </a>
+                                  </li>
+                                  <li class="page-item"><a class="page-link" href="#">1</a></li>
+                                  <li class="page-item">
+                                      <a class="page-link" href="#" aria-label="Next">
+                                          <span aria-hidden="true">&raquo;</span>
+                                      </a>
+                                  </li>
+                              </ul>
+                          </nav>
+                      {% else %}
+                        <h2>Вы ещё не совершали покупок</h2>
+                      {% endif %}
+                  </div>
+              </div>
+              <script>
+                    function switchButton(btnID) {
+                        var someListItemEl = document.getElementById(btnID);
+                        var tab = new bootstrap.Tab(someListItemEl);
+
+                        tab.show();
+                    }
+
+                    $('#personal-account-btn').on('click', function() {
+                        switchButton('list-personal-account-list');
+                    });
+                    $('#personal-data-btn').on('click', function() {
+                        switchButton('list-personal-data-list');
+                    });
+                    $('#order-history-btn').on('click', function() {
+                        switchButton('list-order-history-list');
+                    });
+              </script>
+          </div>
+        </div>
+    </div>
+{% endblock %}

@@ -347,3 +347,12 @@ h4 {
 header {
     margin-bottom: 70px;
 }
+
+.personal_account_title {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.order-table-container {
+    padding: 10px;
+}

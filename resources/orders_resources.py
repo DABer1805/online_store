@@ -1,4 +1,4 @@
-from flask import jsonify
+from flask import jsonify, request
 from flask_restful import abort, Resource, reqparse
 
 from data import db_session
@@ -35,12 +35,17 @@ class OrdersListResource(Resource):
 
     def get(self):
         session = db_session.create_session()
-        orders = session.query(Order).all()
+        user_id = request.args.get('user_id')
+        print(user_id)
+        if user_id:
+            orders = session.query(Order).filter(Order.user_id == user_id)
+        else:
+            orders = session.query(Order).all()
         return jsonify({
             'orders': [
                 item.to_dict(only=(
                     'id', 'items_list', 'is_complited',
-                    'user.mobile_phone', 'user.name'
+                    'start_date', 'end_date'
                 ))
                 for item in orders
             ]})
