@@ -72,7 +72,10 @@ class ItemsListResource(Resource):
             price=args['price'],
             discount=args['discount'],
             supplier=args['supplier'],
-            category=args['category']
+            category=args['category'],
+            min_temp=args['min_temp'],
+            max_temp=args['max_temp'],
+            expiration_date=args['expiration_date']
         )
         session.add(item)
         session.commit()
@@ -93,3 +96,6 @@ parser.add_argument('price', required=True, type=float)
 parser.add_argument('discount', required=True, type=int)
 parser.add_argument('supplier', required=True, type=int)
 parser.add_argument('category', required=True, type=int)
+parser.add_argument('min_temp', required=True, type=int)
+parser.add_argument('max_temp', required=True, type=int)
+parser.add_argument('expiration_date', required=True, type=str)

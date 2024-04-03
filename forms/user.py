@@ -1,8 +1,9 @@
 from flask_wtf import FlaskForm
 from wtforms import PasswordField, StringField, SubmitField, TelField, \
-    BooleanField, FileField, FloatField, IntegerField, SelectField
+    BooleanField, FileField, FloatField, IntegerField, SelectField, \
+    TextAreaField
 from wtforms.validators import DataRequired, Length, NumberRange, Email
-from data.constants import MAX_PRICE, PRODUCTS_CATEGORIES
+from data.constants import MAX_PRICE, CATEGORIES
 
 
 class LoginForm(FlaskForm):
@@ -67,10 +68,28 @@ class AddProductForm(FlaskForm):
     discount = IntegerField(
         'Скидка 0-100%', validators=[DataRequired(), NumberRange(0, 100)]
     )
+
+    # минимальная температура
+    min_temp = IntegerField(
+        'Минимальная температура хранения',
+        validators=[DataRequired(), NumberRange(-100, 100)]
+    )
+    # максимальная температура
+    max_temp = IntegerField(
+        'Максимальная температура хранения',
+        validators=[DataRequired(), NumberRange(-100, 100)]
+    )
+    # срок годности
+    expiration_date = IntegerField(
+        'Срок годности в днях',
+        validators=[DataRequired(), NumberRange(0, 10000000)]
+    )
+    # Поле дополнительная информация
+    extra_information = TextAreaField('Дополнительная информация')
     # Категория товара
     category = SelectField(
         'Категория товара',
-        choices=PRODUCTS_CATEGORIES,
+        choices=[name['name'] for name in CATEGORIES[1:]],
         validators=[DataRequired()]
     )
     # Кнопка отправки формы

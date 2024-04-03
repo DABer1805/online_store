@@ -7,7 +7,8 @@ from requests import get, post
 
 from api import calculate_cost_api, user_basket_api, add_item_to_basket_api, \
     del_item_in_basket_api
-from data.constants import DB_NAME, TEST_DB_NAME, MAX_PRICE, ALLOWED_EXTENSIONS
+from data.constants import DB_NAME, TEST_DB_NAME, MAX_PRICE, \
+    ALLOWED_EXTENSIONS, CATEGORIES
 from data import db_session
 from resources import orders_resources, users_resources, items_resources, \
     categories_resources, suppliers_resources
@@ -333,8 +334,8 @@ def add_product_page():
                     image.save(path_to_save)
                 else:
                     return render_template(
-                        'add_product.html', title="Страница управления", form=form,
-                        message="Недопустимый формат изображения"
+                        'add_product.html', title="Страница управления",
+                        form=form, message="Недопустимый формат изображения"
                     )
             # добавляем товар
             post(
@@ -346,7 +347,10 @@ def add_product_page():
                     "supplier": 1,
                     "category": session.query(Category).filter(
                         Category.name == form.category.data
-                    ).first().id
+                    ).first().id,
+                    "min_temp": form.min_temp.data,
+                    "max_temp": form.max_temp.data,
+                    "expiration_date": f"{form.expiration_date.data} дней" # TODO: Сделать логику для неограниченного срока
                 }
             )
         # при ошибке ввода цены
@@ -367,8 +371,6 @@ def add_supplier_page():
 
     # создание формы добавления товаров
     form = AddSupplierForm()
-
-    session = db_session.create_session()
 
     # Проверка id пользователя (доступ только для id == 1)
     if int(current_user.get_id()) == 1:
@@ -393,8 +395,8 @@ def add_supplier_page():
 
 
 def main():
-    # Устанавливаем соедениние с БД
-    db_session.global_init(f'db/{TEST_DB_NAME}')
+    # Устанавливаем соединение с БД
+    db_session.global_init(f'db/{DB_NAME}')
     # Запускаем предложение
     app.run()
 
