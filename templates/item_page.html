@@ -1,15 +1,20 @@
 {% extends "base.html" %}
 
 {% block content %}
+    <meta id="data" data-item-id="{{ item['id'] }}"
+          data-item-name="{{ item['name'] }}"
+          data-max-price="{{ max_price }}"
+          data-cat-names="{{ categories['names'] }}"
+          data-cat-ids="{{ categories['ids'] }}">
     <div class="container">
         <div class="row">
             <div class="col-12 breadcrumb-container">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="/">Главная</a></li>
-                    {% if not anchor %}
+                    {% if from_catalog %}
                         <li class="breadcrumb-item"><a href="/catalog">Каталог</a></li>
                         {% if categories %}
-                            <li class="breadcrumb-item"><a href="/catalog?cat={{ categories['ids'] }}&max_price={{ max_price }}">{{ categories['names'] }}</a></li>
+                            <li class="breadcrumb-item"><a href="/catalog?cat={categories['ids']}}&max_price={{ max_price }}">{{ categories['names'] }}</a></li>
                         {% endif %}
                     {% endif %}
                     <li class="breadcrumb-item active" aria-current="page">{{ item['name'] }}</li>
@@ -18,23 +23,18 @@
         </div>
         <div class="row">
             <div class="col-12 return-to-catalog">
-                {% if anchor %}
-                    <a href="/">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-double-left" viewBox="0 0 16 16">
-                          <path fill-rule="evenodd" d="M8.354 1.646a.5.5 0 0 1 0 .708L2.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"/>
-                          <path fill-rule="evenodd" d="M12.354 1.646a.5.5 0 0 1 0 .708L6.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"/>
-                        </svg>
-                    </a>
-                    <a href="/">Обратно</a>
+                {% if from_catalog %}
+                    {% set link = "/catalog?cat={{ categories['ids'] }}&max_price={{ max_price }}" %}
                 {% else %}
-                    <a href="/catalog?cat={{ categories['ids'] }}&max_price={{ max_price }}">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-double-left" viewBox="0 0 16 16">
-                          <path fill-rule="evenodd" d="M8.354 1.646a.5.5 0 0 1 0 .708L2.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"/>
-                          <path fill-rule="evenodd" d="M12.354 1.646a.5.5 0 0 1 0 .708L6.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"/>
-                        </svg>
-                    </a>
-                    <a href="/catalog?cat={{ categories['ids'] }}&max_price={{ max_price }}">Обратно</a>
+                    {% set link = "/" %}
                 {% endif %}
+                <a href="{{ link }}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-double-left" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M8.354 1.646a.5.5 0 0 1 0 .708L2.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"/>
+                        <path fill-rule="evenodd" d="M12.354 1.646a.5.5 0 0 1 0 .708L6.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"/>
+                    </svg>
+                </a>
+                <a href="{{ link }}">Обратно</a>
             </div>
         </div>
         <div class="row">
@@ -204,5 +204,24 @@
         var firstTab = new bootstrap.Tab(firstTabEl);
 
         firstTab.show();
+    </script>
+    <script>
+        var itemId = $('#data').data()['itemId'];
+        var itemName = $('#data').data()['itemName'];
+        var maxPrice = $('#data').data()['maxPrice'];
+        var catNames = $('#data').data()['catNames'];
+        var catIds = $('#data').data()['catIds'];
+        personalAccountLink = document.getElementsByName(
+            'current_user'
+        )[0];
+        var link = `${personalAccountLink}?from_catalog=true&from_item_page=${itemId}&item_name=${itemName}`;
+        if (maxPrice) {
+            link = link + `&max_price=${maxPrice}`;
+        }
+        if (catNames) {
+            link = link + `&cat_filters=${catNames}`;
+            link = link + `&cat_ids=${catIds}`;
+        }
+        personalAccountLink.setAttribute('href', link);
     </script>
 {% endblock %}

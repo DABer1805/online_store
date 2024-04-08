@@ -3,14 +3,31 @@
 {% block content %}
     <div class="container">
         <div class="row">
+            <div class="col-12 breadcrumb-container">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Главная</a></li>
+                    {% if from_catalog %}
+                        <li class="breadcrumb-item"><a href="/catalog">Каталог</a></li>
+                    {% endif %}
+                    {% if cat_filters %}
+                        <li class="breadcrumb-item"><a href="/catalog?cat={{ cat_ids }}">{{ cat_filters }}</a></li>
+                    {% endif %}
+                    {% if from_item_page %}
+                        <li class="breadcrumb-item"><a href="/catalog/{{ from_item_page }}?max_price={{ max_price }}{{ '&cat={{ cat_ids }}' if cat_filters }}{{ '&from_catalog=true' if from_catalog }}">{{ item_name }}</a></li>
+                    {% endif %}
+                    <li class="breadcrumb-item active" aria-current="page">Личный кабинет</li>
+                </ol>
+            </div>
+        </div>
+        <div class="row">
           <div class="col-md-4 col-sm-12">
               <h2 class="personal_account_title">Мой аккаунт</h2>
               <div class="list-group" id="list-tab" role="tablist">
                   <a class="list-group-item list-group-item-action active" id="list-home-list" data-bs-toggle="list" href="#list-home" role="tab" aria-controls="list-home">Мой кабинет</a>
-                  <a class="list-group-item list-group-item-action" id="list-personal-account-list" data-bs-toggle="list" href="#list-personal-account" role="tab" aria-controls="list-personal-account">Личный счёт</a>
                   <a class="list-group-item list-group-item-action" id="list-personal-data-list" data-bs-toggle="list" href="#list-personal-data" role="tab" aria-controls="list-personal-data">Личные данные</a>
                   <a class="list-group-item list-group-item-action" id="list-order-history-list" data-bs-toggle="list" href="#list-order-history" role="tab" aria-controls="list-order-history">История заказов</a>
               </div>
+              <a type="button" class="btn btn-primary" href="/logout">Выход</a>
           </div>
           <div class="col-md-8 col-sm-12">
               <h1 class="personal_account_title">Личный кабинет</h1>
@@ -19,19 +36,9 @@
                       <div class="container">
                         <div class="row">
                             <div class="col-lg-6 col-sm-12">
-                                <div class="product-card" id="personal-account-btn">
-                                    <div class="product-thumb">
-                                        <a><img src="/static/img/personal_account_cards/card_1.png"></a>
-                                    </div>
-                                    <div class="catalog-title">
-                                        <h3>Личный счёт</h3>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-6 col-sm-12">
                                 <div class="product-card" id="personal-data-btn">
                                     <div class="product-thumb">
-                                        <a><img src="/static/img/personal_account_cards/card_2.png"></a>
+                                        <a><img src="/static/img/personal_account_cards/card_1.png"></a>
                                     </div>
                                     <div class="catalog-title">
                                         <h3>Личные данные</h3>
@@ -41,7 +48,7 @@
                             <div class="col-lg-6 col-sm-12">
                                 <div class="product-card" id="order-history-btn">
                                     <div class="product-thumb">
-                                        <a><img src="/static/img/personal_account_cards/card_3.png"></a>
+                                        <a><img src="/static/img/personal_account_cards/card_2.png"></a>
                                     </div>
                                     <div class="catalog-title">
                                         <h3>История заказов</h3>
@@ -51,14 +58,39 @@
                         </div>
                     </div>
                   </div>
-                  <div class="tab-pane fade show" id="list-personal-account" role="tabpanel" aria-labelledby="list-personal-account-list">Личный счёт</div>
-                  <div class="tab-pane fade show" id="list-personal-data" role="tabpanel" aria-labelledby="list-personal-data-list">Личные данные</div>
+                  <div class="tab-pane fade show" id="list-personal-data" role="tabpanel" aria-labelledby="list-personal-data-list">
+                      <h2>Личные данные</h2>
+                      <ul>
+                          <li><span class="user-info-title">Фамилия: </span><span class="user-info-data">{{ current_user.name }}</span></li>
+                          <li><span class="user-info-title">Имя: </span><span class="user-info-data">{{ current_user.surname }}</span></li>
+                          <li><span class="user-info-title">Номер телефона: </span><span class="user-info-data">{{ current_user.mobile_phone }}</span></li>
+                      </ul>
+                      <a type="button" class="btn btn-primary" href="/change_user_data">Редактировать</a>
+                  </div>
                   <div class="tab-pane fade show" id="list-order-history" role="tabpanel" aria-labelledby="list-order-history-list">
                       {% if orders|length > 0 %}
                         <h2>Ваши заказы</h2>
+                            <nav aria-label="Page navigation example">
+                              <ul class="pagination justify-content-center">
+                                  <li class="page-item disabled" id="order-prev-btn-container">
+                                      <a class="page-link" id="order-prev-btn" aria-label="Previous">
+                                          <span class="noselect" aria-hidden="true">&laquo;</span>
+                                      </a>
+                                  </li>
+                                  <li class="page-item"><a class="page-link"><span class="noselect" id="cur-order-number">1</span></a></li>
+                                  <li
+                                          class="{{ 'page-item disabled' if orders|length == 1 else 'page-item' }}" id="order-next-btn-container">
+                                      <a class="page-link" id="order-next-btn" aria-label="Next">
+                                          <span class="noselect" aria-hidden="true">&raquo;</span>
+                                      </a>
+                                  </li>
+                              </ul>
+                            </nav>
                             {% for order in orders %}
                                 <div class="order-table-container">
-                                    <table class="table table-bordered" style="{{'display: block;' if loop.first else 'display: none;'}}">
+                                    <table name="{{'first' if loop.first else 'last' if loop.last else 'mid'}}"
+                                           class="table table-bordered" id="order{{ loop.index }}"
+                                           style="{{'display: block;' if loop.first else 'display: none;'}}">
                                         <thead class="table-secondary">
                                         <tr>
                                             <th>ID</th>
@@ -104,32 +136,86 @@
                                     </table>
                                 </div>
                           {% endfor %}
-                          <nav aria-label="Page navigation example">
-                              <ul class="pagination">
-                                  <li class="page-item">
-                                      <a class="page-link" href="#" aria-label="Previous">
-                                          <span aria-hidden="true">&laquo;</span>
-                                      </a>
-                                  </li>
-                                  <li class="page-item"><a class="page-link" href="#">1</a></li>
-                                  <li class="page-item">
-                                      <a class="page-link" href="#" aria-label="Next">
-                                          <span aria-hidden="true">&raquo;</span>
-                                      </a>
-                                  </li>
-                              </ul>
-                          </nav>
                       {% else %}
                         <h2>Вы ещё не совершали покупок</h2>
                       {% endif %}
                   </div>
               </div>
               <script>
+                    var cur_order_id = 1;
+
                     function switchButton(btnID) {
                         var someListItemEl = document.getElementById(btnID);
                         var tab = new bootstrap.Tab(someListItemEl);
 
                         tab.show();
+                    }
+
+                    function changeCurOrderNumber(curOrderId) {
+                        var curOrderNumber = document.getElementById(
+                            'cur-order-number'
+                        );
+                        curOrderNumber.innerHTML = `${curOrderId}`;
+                    }
+
+                    function toNextOrder() {
+                        var curOrder = document.getElementById(
+                            `order${cur_order_id}`
+                        );
+                        curOrder.style.display = 'none';
+
+                        cur_order_id++;
+                        var nextOrder = document.getElementById(
+                            `order${cur_order_id}`
+                        );
+                        nextOrder.style.display = 'block';
+
+                        changeCurOrderNumber(cur_order_id);
+
+                        prevBtn = document.getElementById(
+                            'order-prev-btn-container'
+                        );
+
+                        nextBtn = document.getElementById(
+                            'order-next-btn-container'
+                        );
+
+                        if (nextOrder.getAttribute('name') == 'last') {
+                            nextBtn.setAttribute(
+                                'class', 'page-item disabled'
+                            );
+                        }
+                        prevBtn.setAttribute('class', 'page-item');
+                    }
+
+                    function toPrevOrder() {
+                        var curOrder = document.getElementById(
+                            `order${cur_order_id}`
+                        );
+                        curOrder.style.display = 'none';
+
+                        cur_order_id--;
+                        var prevOrder = document.getElementById(
+                            `order${cur_order_id}`
+                        );
+                        prevOrder.style.display = 'block';
+
+                        changeCurOrderNumber(cur_order_id);
+
+                        prevBtn = document.getElementById(
+                            'order-prev-btn-container'
+                        );
+
+                        nextBtn = document.getElementById(
+                            'order-next-btn-container'
+                        );
+
+                        if (prevOrder.getAttribute('name') == 'first') {
+                            prevBtn.setAttribute(
+                                'class', 'page-item disabled'
+                            );
+                        }
+                        nextBtn.setAttribute('class', 'page-item');
                     }
 
                     $('#personal-account-btn').on('click', function() {
@@ -140,6 +226,12 @@
                     });
                     $('#order-history-btn').on('click', function() {
                         switchButton('list-order-history-list');
+                    });
+                    $('#order-next-btn').on('click', function() {
+                        toNextOrder();
+                    });
+                    $('#order-prev-btn').on('click', function() {
+                        toPrevOrder();
                     });
               </script>
           </div>

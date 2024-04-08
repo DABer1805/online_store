@@ -109,7 +109,7 @@ def login():
             # Авторизизуем пользователя
             login_user(user, remember=form.remember_me.data)
             # Перенаправляем пользователя на каталог
-            return redirect("catalog")
+            return redirect("/")
         # Открываем страничку с формой авторизации и выводим уведомление о
         # некорректности данных
         return render_template('login.html',
@@ -165,6 +165,52 @@ def reqister():
         # Перенаправляем на форму авторизации
         return redirect('/login')
     # Открываем страничку с формой регистрации
+    return render_template('register.html', title='Регистрация', form=form)
+
+
+@app.route('/change_user_data', methods=['GET', 'POST'])
+def change_user_data():
+    form = RegisterForm()
+    if request.method == "GET":
+        db_sess = db_session.create_session()
+        user = db_sess.query(User).filter(User.id == current_user.id).first()
+        if user:
+            form.mobile_phone.data = user.mobile_phone
+            form.surname.data = user.surname
+            form.name.data = user.name
+        else:
+            abort(404)
+    if form.validate_on_submit():
+        db_sess = db_session.create_session()
+        user = db_sess.query(User).filter(
+            User.id == current_user.id
+        ).first()
+        if user:
+            if form.password.data != form.password_again.data:
+                # Открываем страничку с формой и выводим уведомление о
+                # некорректности данных
+                return render_template(
+                    'register.html', title='Регистрация', form=form,
+                    message="Пароли не совпадают"
+                )
+            # Проверяем нет ли в БД пользователя с таким номером
+            if db_sess.query(User).filter(
+                    User.mobile_phone == form.mobile_phone.data
+            ).first():
+                # Открываем страничку с формой и выводим уведомление о
+                # некорректности данных
+                return render_template(
+                    'register.html', title='Регистрация', form=form,
+                    message="Такой пользователь уже есть"
+                )
+            user.mobile_phone = form.mobile_phone.data
+            user.surname = form.surname.data
+            user.name = form.name.data
+            user.set_password(form.password.data)
+            db_sess.commit()
+            return redirect('/personal_account')
+        else:
+            abort(404)
     return render_template('register.html', title='Регистрация', form=form)
 
 
@@ -241,8 +287,8 @@ def item_page(item_id):
     item = get(f'http://localhost:5000/api/items/{item_id}').json()['item']
     # Категории предыдущей страницы каталога
     cat = request.args.get('cat')
-    # Если открыта страница товара не из каталога
-    anchor = request.args.get('anchor')
+    # Если открыта страница товара из каталога
+    from_catalog = request.args.get('from_catalog')
     # Максимальная цена фильтра каталога при открытии страницы товара
     max_price = request.args.get('max_price')
     # ЕСли параметр максимальной цены не передан, то устанавливаем дефолтное
@@ -272,7 +318,7 @@ def item_page(item_id):
     ).json()['items']
     return render_template(
         "item_page.html", title='Продуктовый рай', item=item,
-        categories=categories, max_price=max_price, anchor=anchor,
+        categories=categories, max_price=max_price, from_catalog=from_catalog,
         user_basket=user_basket
     )
 
@@ -301,9 +347,18 @@ def home_page():
         user_basket=user_basket
     )
 
+
 @app.route("/personal_account")
 def personal_account():
     if current_user.is_authenticated:
+        # Если открыта страница товара из каталога
+        from_catalog = request.args.get('from_catalog')
+        from_item_page = request.args.get('from_item_page')
+        cat_filters = request.args.get('cat_filters')
+        cat_ids = request.args.get('cat_ids')
+        max_price = request.args.get('max_price')
+        item_name = request.args.get('item_name')
+
         orders = get(
             'http://localhost:5000/api/orders',
             params={'user_id': current_user.id}
@@ -316,7 +371,10 @@ def personal_account():
             ).json()['items']
 
         return render_template(
-            "personal_account.html", title='Продуктовый рай', orders=orders
+            "personal_account.html", title='Продуктовый рай', orders=orders,
+            from_catalog=from_catalog, from_item_page=from_item_page,
+            cat_filters=cat_filters, cat_ids=cat_ids, item_name=item_name,
+            max_price=max_price
         )
 
     abort(404, message=f"User is not authenticated")

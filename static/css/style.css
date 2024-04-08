@@ -344,10 +344,6 @@ h4 {
     color: #fff;
 }
 
-header {
-    margin-bottom: 70px;
-}
-
 .personal_account_title {
     margin-top: 20px;
     margin-bottom: 20px;
@@ -355,4 +351,17 @@ header {
 
 .order-table-container {
     padding: 10px;
+}
+
+.user-info-title {
+    padding-left: 20px;
+    font-size: 25px;
+    font-weight: 500;
+    color: #6c757d;
+}
+
+.user-info-data {
+    font-size: 18px;
+    font-weight: 300;
+    color: #a1a1a1;
 }
