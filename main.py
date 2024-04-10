@@ -305,6 +305,7 @@ def home_page():
         user_basket=user_basket
     )
 
+
 @app.route("/personal_account")
 def personal_account():
     if current_user.is_authenticated:
@@ -376,13 +377,15 @@ def add_product_page():
         # при ошибке ввода цены
         elif form.cost.data is None and request.files:
             return render_template(
-                'add_product.html', title="Страница управления", form=form,
+                'add_product.html', title="Добавить товар", form=form,
                 cost_error=True
             )
 
         return render_template(
-            'add_product.html', title="Страница управления", form=form
+            'add_product.html', title="Добавить товар", form=form
         )
+
+    abort(404, message=f"No access rights")
 
 
 @app.route("/add_supplier", methods=['GET', 'POST'])
@@ -412,6 +415,29 @@ def add_supplier_page():
         return render_template(
             'add_supplier.html', title="Регистрация поставщика", form=form
         )
+
+    abort(404, message=f"No access rights")
+
+
+@app.route("/admin", methods=['GET', 'DELETE', 'POST'])
+def admin():
+    """Страничка админа"""
+
+    # Проверка id пользователя (доступ только для id == 1)
+    if int(current_user.get_id()) == 1:
+        users = get('http://localhost:5000/api/users').json()['users']
+        items = get('http://localhost:5000/api/items').json()['items']
+        suppliers = get(
+            'http://localhost:5000/api/suppliers'
+        ).json()['suppliers']
+
+
+        return render_template(
+            'admin.html', title="Админ", users=users, items=items,
+            suppliers=suppliers
+        )
+
+    abort(404, message=f"No access rights")
 
 
 def main():

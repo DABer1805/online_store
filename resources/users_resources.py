@@ -37,7 +37,7 @@ class UsersListResource(Resource):
         return jsonify({
             'users': [
                 item.to_dict(only=(
-                    'id', 'items_list', 'mobile_phone'
+                    'id', 'surname', 'name', 'items_list', 'mobile_phone'
                 ))
                 for item in users
             ]})

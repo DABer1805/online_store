@@ -3,7 +3,7 @@ from wtforms import PasswordField, StringField, SubmitField, TelField, \
     BooleanField, FileField, FloatField, IntegerField, SelectField, \
     TextAreaField
 from wtforms.validators import DataRequired, Length, NumberRange, Email
-from data.constants import MAX_PRICE, CATEGORIES
+from data.constants import MAX_PRICE, ADD_PRODUCT_CATEGORIES
 
 
 class LoginForm(FlaskForm):
@@ -89,7 +89,7 @@ class AddProductForm(FlaskForm):
     # Категория товара
     category = SelectField(
         'Категория товара',
-        choices=[name['name'] for name in CATEGORIES[1:]],
+        choices=ADD_PRODUCT_CATEGORIES,
         validators=[DataRequired()]
     )
     # Кнопка отправки формы
