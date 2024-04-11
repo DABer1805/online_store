@@ -14,7 +14,7 @@
                     {% if from_catalog %}
                         <li class="breadcrumb-item"><a href="/catalog">Каталог</a></li>
                         {% if categories %}
-                            <li class="breadcrumb-item"><a href="/catalog?cat={categories['ids']}}&max_price={{ max_price }}">{{ categories['names'] }}</a></li>
+                            <li class="breadcrumb-item"><a href="/catalog?cat={{categories['ids']}}&max_price={{ max_price }}">{{ categories['names'] }}</a></li>
                         {% endif %}
                     {% endif %}
                     <li class="breadcrumb-item active" aria-current="page">{{ item['name'] }}</li>
@@ -24,7 +24,11 @@
         <div class="row">
             <div class="col-12 return-to-catalog">
                 {% if from_catalog %}
-                    {% set link = "/catalog?cat={{ categories['ids'] }}&max_price={{ max_price }}" %}
+                    {% if categories %}
+                        {% set link = "/catalog?cat={{ categories['ids'] }}&max_price={{ max_price }}" %}
+                    {% else %}
+                        {% set link = "/catalog" %}
+                    {% endif %}
                 {% else %}
                     {% set link = "/" %}
                 {% endif %}
@@ -220,7 +224,7 @@
         }
         if (catNames) {
             link = link + `&cat_filters=${catNames}`;
-            link = link + `&cat_ids=${catIds}`;
+            link = link + `&cat=${catIds}`;
         }
         personalAccountLink.setAttribute('href', link);
     </script>

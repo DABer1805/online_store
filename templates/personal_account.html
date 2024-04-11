@@ -1,8 +1,17 @@
+<!-- Страница личного кабинета -->
 {% extends "base.html" %}
 
 {% block content %}
+    <!--  Служебные данные для сборки ссылок -->
+    <meta id="data" data-from-catalog="{{ from_catalog }}"
+          data-item-id="{{ from_item_page }}"
+          data-max-price="{{ max_price }}"
+          data-cat-ids="{{ cat_ids }}">
+    <!-- Контейнер со всем содержимым на странице -->
     <div class="container">
+        <!-- Контейнер с бредкрампом -->
         <div class="row">
+            <!-- Бредкрамп -->
             <div class="col-12 breadcrumb-container">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="/">Главная</a></li>
@@ -13,12 +22,27 @@
                         <li class="breadcrumb-item"><a href="/catalog?cat={{ cat_ids }}">{{ cat_filters }}</a></li>
                     {% endif %}
                     {% if from_item_page %}
-                        <li class="breadcrumb-item"><a href="/catalog/{{ from_item_page }}?max_price={{ max_price }}{{ '&cat={{ cat_ids }}' if cat_filters }}{{ '&from_catalog=true' if from_catalog }}">{{ item_name }}</a></li>
+                        <li class="breadcrumb-item"><a href="/catalog" id="item-page-href">{{ item_name }}</a></li>
                     {% endif %}
                     <li class="breadcrumb-item active" aria-current="page">Личный кабинет</li>
                 </ol>
             </div>
         </div>
+        <!-- Контейнер с кнопкой возврата -->
+        <div class="row">
+            <!-- Стрелочка возврата -->
+            <div class="col-12 return-to-catalog">
+                <a href="/" id="return_to_prev_page_btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-double-left" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M8.354 1.646a.5.5 0 0 1 0 .708L2.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"/>
+                        <path fill-rule="evenodd" d="M12.354 1.646a.5.5 0 0 1 0 .708L6.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"/>
+                    </svg>
+                </a>
+                <!-- Текст возврата -->
+                <a href="/" id="return_to_prev_page_txt">Обратно</a>
+            </div>
+        </div>
+        <!-- Контейнер с переключателем вкладок личного кабинета -->
         <div class="row">
           <div class="col-md-4 col-sm-12">
               <h2 class="personal_account_title">Мой аккаунт</h2>
@@ -27,11 +51,15 @@
                   <a class="list-group-item list-group-item-action" id="list-personal-data-list" data-bs-toggle="list" href="#list-personal-data" role="tab" aria-controls="list-personal-data">Личные данные</a>
                   <a class="list-group-item list-group-item-action" id="list-order-history-list" data-bs-toggle="list" href="#list-order-history" role="tab" aria-controls="list-order-history">История заказов</a>
               </div>
-              <a type="button" class="btn btn-primary" href="/logout">Выход</a>
+              <!-- Кнопка выхода из профиля -->
+              <a type="button" class="btn btn-primary exit-btn" href="/logout">Выход</a>
           </div>
+          <!-- Контейнер со вкладками личного кабинета -->
           <div class="col-md-8 col-sm-12">
+              <!-- Общий заголовок -->
               <h1 class="personal_account_title">Личный кабинет</h1>
               <div class="tab-content" id="nav-tabContent">
+                  <!-- Вкладка с карточками -->
                   <div class="tab-pane fade show active" id="list-home" role="tabpanel" aria-labelledby="list-home-list">
                       <div class="container">
                         <div class="row">
@@ -59,17 +87,21 @@
                     </div>
                   </div>
                   <div class="tab-pane fade show" id="list-personal-data" role="tabpanel" aria-labelledby="list-personal-data-list">
+                      <!-- Вкладка с личными данными -->
                       <h2>Личные данные</h2>
                       <ul>
                           <li><span class="user-info-title">Фамилия: </span><span class="user-info-data">{{ current_user.name }}</span></li>
                           <li><span class="user-info-title">Имя: </span><span class="user-info-data">{{ current_user.surname }}</span></li>
                           <li><span class="user-info-title">Номер телефона: </span><span class="user-info-data">{{ current_user.mobile_phone }}</span></li>
                       </ul>
+                      <!-- Кнопка редактирования -->
                       <a type="button" class="btn btn-primary" href="/change_user_data">Редактировать</a>
                   </div>
                   <div class="tab-pane fade show" id="list-order-history" role="tabpanel" aria-labelledby="list-order-history-list">
+                      <!-- Вкладка со всеми заказами -->
                       {% if orders|length > 0 %}
                         <h2>Ваши заказы</h2>
+                            <!-- Листалка заказов -->
                             <nav aria-label="Page navigation example">
                               <ul class="pagination justify-content-center">
                                   <li class="page-item disabled" id="order-prev-btn-container">
@@ -86,6 +118,7 @@
                                   </li>
                               </ul>
                             </nav>
+                            <!-- Собираем таблички с заказами -->
                             {% for order in orders %}
                                 <div class="order-table-container">
                                     <table name="{{'first' if loop.first else 'last' if loop.last else 'mid'}}"
@@ -137,11 +170,53 @@
                                 </div>
                           {% endfor %}
                       {% else %}
+                        <!-- Если не было выполнено ни одного заказа -->
                         <h2>Вы ещё не совершали покупок</h2>
                       {% endif %}
                   </div>
               </div>
               <script>
+                    var link = '/';
+
+                    var itemId = $('#data').data()['itemId'];
+                    var maxPrice = $('#data').data()['maxPrice'];
+                    var catIds = $('#data').data()['catIds'];
+                    var fromCatalog = $('#data').data()['fromCatalog'];
+
+                    console.log(itemId);
+
+                    if (fromCatalog != 'None') {
+                        link = link + 'catalog';
+                        if (itemId != 'None') {
+                            link = link + `/${itemId}`;
+                            if (maxPrice != 'None') {
+                                link = link + `?max_price=${maxPrice}`;
+                            }
+                            link = link + '&from_item_page=${itemId}';
+                        }
+                        if (maxPrice != 'None') {
+                            link = link + `?max_price=${maxPrice}`;
+                        }
+                        if (catIds != 'None') {
+                            link = link + `&cat=${catIds}`;
+                        }
+                        link = link + '&from_catalog=true';
+                    }
+
+                    returnToPrevPageBtn = document.getElementById(
+                        'return_to_prev_page_btn'
+                    );
+                    returnToPrevPageTxt = document.getElementById(
+                        'return_to_prev_page_txt'
+                    );
+                    itemPageHref = document.getElementById(
+                        'item-page-href'
+                    );
+
+                    returnToPrevPageBtn.setAttribute('href', link);
+                    returnToPrevPageTxt.setAttribute('href', link);
+                    itemPageHref.setAttribute('href', link);
+
                     var cur_order_id = 1;
 
                     function switchButton(btnID) {

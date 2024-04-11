@@ -5,10 +5,15 @@ TEST_DB_NAME = 'shop_test.db'
 # Максимальная цена товара (для слайдера на экране фильтрации)
 MAX_PRICE = 10000
 CATEGORIES = [
-    {'name': 'Все товары', 'link': '/catalog'},
-    {'name': 'Овощи и фрукты', 'link': '/catalog?cat=3'},
-    {'name': 'Молоко, сыр, яйца', 'link': '/catalog?cat=1,2'},
-    {'name': 'Мясо, птица, колбасы', 'link': '/catalog?cat=4,9'},
-    {'name': 'Хлеб, выпечка, снеки', 'link': '/catalog?cat=6'},
-    {'name': 'Рыба и морепродукты', 'link': '/catalog?cat=10'}
+    {'name': 'Все товары', 'link': f'/catalog?max_price={MAX_PRICE}'},
+    {'name': 'Овощи и фрукты',
+     'link': f'/catalog?cat=3&max_price={MAX_PRICE}'},
+    {'name': 'Молоко, сыр, яйца',
+     'link': f'/catalog?cat=1,2&max_price={MAX_PRICE}'},
+    {'name': 'Мясо, птица, колбасы',
+     'link': f'/catalog?cat=4,9&max_price={MAX_PRICE}'},
+    {'name': 'Хлеб, выпечка, снеки',
+     'link': f'/catalog?cat=6&max_price={MAX_PRICE}'},
+    {'name': 'Рыба и морепродукты',
+     'link': f'/catalog?cat=10&max_price={MAX_PRICE}'}
 ]

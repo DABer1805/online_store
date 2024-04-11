@@ -170,22 +170,36 @@ def reqister():
 
 @app.route('/change_user_data', methods=['GET', 'POST'])
 def change_user_data():
+    """ Редактирование данных пользователя """
     form = RegisterForm()
+    # Подгрузка текущей инфы в поля формочки
     if request.method == "GET":
+        # Сессия подключения к БД
         db_sess = db_session.create_session()
+        # Достаём нашего пользователя из БД
         user = db_sess.query(User).filter(User.id == current_user.id).first()
+        # Если нашелся
         if user:
+            # Заполяняем поле с номером телефона
             form.mobile_phone.data = user.mobile_phone
+            # Заполяняем поле с фамилией
             form.surname.data = user.surname
+            # Заполяняем поле с именем
             form.name.data = user.name
         else:
+            # Кидаем ошибку
             abort(404)
+    # Если пользователь нажал на кнопку
     if form.validate_on_submit():
+        # Сессия подключения к БД
         db_sess = db_session.create_session()
+        # Достаём нашего пользователя из БД
         user = db_sess.query(User).filter(
             User.id == current_user.id
         ).first()
+        # Если нашелся
         if user:
+            # Пароли не совпали
             if form.password.data != form.password_again.data:
                 # Открываем страничку с формой и выводим уведомление о
                 # некорректности данных
@@ -203,14 +217,22 @@ def change_user_data():
                     'register.html', title='Регистрация', form=form,
                     message="Такой пользователь уже есть"
                 )
+            # Переприсваиваем поле с номером телефона
             user.mobile_phone = form.mobile_phone.data
+            # Переприсваиваем поле с фамилией
             user.surname = form.surname.data
+            # Переприсваиваем поле с именем
             user.name = form.name.data
+            # Устанавливаем новый пароль
             user.set_password(form.password.data)
+            # Коммитим
             db_sess.commit()
+            # Перенаправляем в личный кабинет
             return redirect('/personal_account')
         else:
+            # Кидаем ошибку
             abort(404)
+    # Открываем страничку с формочкой
     return render_template('register.html', title='Регистрация', form=form)
 
 
@@ -351,25 +373,33 @@ def home_page():
 @app.route("/personal_account")
 def personal_account():
     if current_user.is_authenticated:
-        # Если открыта страница товара из каталога
+        # Если страница открыта из каталога
         from_catalog = request.args.get('from_catalog')
+        # Если открыта страница из товарной страницы
         from_item_page = request.args.get('from_item_page')
+        # Названия фильтров
         cat_filters = request.args.get('cat_filters')
-        cat_ids = request.args.get('cat_ids')
+        # id фильтров
+        cat_ids = request.args.get('cat')
+        # Максимальная цена
         max_price = request.args.get('max_price')
+        # Название товара
         item_name = request.args.get('item_name')
 
+        # Получаем все заказы
         orders = get(
             'http://localhost:5000/api/orders',
             params={'user_id': current_user.id}
         ).json()['orders']
 
+        # Еще на каддый товар из списка получаем детальную информацию
         for order in orders:
             order['items_list'] = get(
                 'http://localhost:5000/api/user_basket',
                 params={'items_list': order['items_list']}
             ).json()['items']
 
+        # Открываем страничку личного кабинета
         return render_template(
             "personal_account.html", title='Продуктовый рай', orders=orders,
             from_catalog=from_catalog, from_item_page=from_item_page,
@@ -377,6 +407,7 @@ def personal_account():
             max_price=max_price
         )
 
+    # Если пользователь не авторизован, то кидаем ошибку
     abort(404, message=f"User is not authenticated")
 
 
