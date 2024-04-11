@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Зарегистрировать поставщика</h1>
+    <form action="/add_supplier" method="post">
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.name.label }}<br>
+            {{ form.name(class="form-control") }}
+        </p>
+        <p>
+            {{ form.payment_account.label }}<br>
+            {{ form.payment_account(class="form-control") }}
+        </p>
+        <p>
+            {{ form.address.label }}<br>
+            {{ form.address(class="form-control") }}
+        </p>
+        <p>
+            {{ form.mobile_phone.label }}<br>
+            {{ form.mobile_phone(class="form-control", type="tel") }}
+            {% for error in form.mobile_phone.errors %}
+                <div class="alert alert-danger" role="alert">
+                    {{ error }}
+                </div>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.email.label }}<br>
+            {{ form.email(class="form-control", type="email") }}
+            {% for error in form.email.errors %}
+                <div class="alert alert-danger" role="alert">
+                    Некорректный email
+                </div>
+            {% endfor %}
+        </p>
+        <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
+        {% if message|length > 0 %}
+        <div div class="alert alert-warning" role="alert">{{ message }}</div>
+        {% endif %}
+    </form>
+{% endblock %}

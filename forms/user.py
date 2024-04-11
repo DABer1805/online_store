@@ -1,7 +1,9 @@
 from flask_wtf import FlaskForm
 from wtforms import PasswordField, StringField, SubmitField, TelField, \
-    BooleanField
-from wtforms.validators import DataRequired, Length
+    BooleanField, FileField, FloatField, IntegerField, SelectField, \
+    TextAreaField
+from wtforms.validators import DataRequired, Length, NumberRange, Email
+from data.constants import MAX_PRICE, ADD_PRODUCT_CATEGORIES
 
 
 class LoginForm(FlaskForm):
@@ -46,3 +48,73 @@ class RegisterForm(FlaskForm):
     remember_me = BooleanField('Запомнить меня')
     # Кнопка отправки формы
     submit = SubmitField('Войти')
+
+
+class AddProductForm(FlaskForm):
+    """Форма добавления продукта"""
+
+    # Загрузка изображения товара
+    product_image = FileField(
+        'Изображение товара', validators=[DataRequired()]
+    )
+    # Имя продукта
+    name = StringField('Имя товара', validators=[DataRequired()])
+    # Цена
+    cost = FloatField(
+        'Цена',
+        validators=[DataRequired(), NumberRange(1, MAX_PRICE)]
+    )
+    # Скидка
+    discount = IntegerField(
+        'Скидка 0-100%', validators=[DataRequired(), NumberRange(0, 100)]
+    )
+
+    # минимальная температура
+    min_temp = IntegerField(
+        'Минимальная температура хранения',
+        validators=[DataRequired(), NumberRange(-100, 100)]
+    )
+    # максимальная температура
+    max_temp = IntegerField(
+        'Максимальная температура хранения',
+        validators=[DataRequired(), NumberRange(-100, 100)]
+    )
+    # срок годности
+    expiration_date = IntegerField(
+        'Срок годности в днях',
+        validators=[DataRequired(), NumberRange(0, 10000000)]
+    )
+    # Поле дополнительная информация
+    extra_information = TextAreaField('Дополнительная информация')
+    # Категория товара
+    category = SelectField(
+        'Категория товара',
+        choices=ADD_PRODUCT_CATEGORIES,
+        validators=[DataRequired()]
+    )
+    # Кнопка отправки формы
+    submit = SubmitField('Добавить товар')
+
+
+class AddSupplierForm(FlaskForm):
+    """Форма добавления поставщика"""
+
+    # Имя поставщика
+    name = StringField('Имя', validators=[DataRequired()])
+    # Расчетный счет
+    payment_account = IntegerField(
+        'Расчетный счет',
+        validators=[DataRequired()]
+    )
+    # Адрес
+    address = StringField('Адрес', validators=[DataRequired()])
+    # Телефон связи
+    mobile_phone = TelField(
+        'Номер телефона', validators=[DataRequired(), Length(max=15)]
+    )
+    # Электронная почта
+    email = StringField(
+        'Электронная почта', validators=[DataRequired(), Email()]
+    )
+    # Кнопка отправки формы
+    submit = SubmitField('Зарегистрировать')

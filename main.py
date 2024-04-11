@@ -7,14 +7,18 @@ from requests import get, post
 
 from api import calculate_cost_api, user_basket_api, add_item_to_basket_api, \
     del_item_in_basket_api
-from data.constants import DB_NAME, MAX_PRICE, CATEGORIES
+from data.constants import DB_NAME, TEST_DB_NAME, MAX_PRICE, \
+    ALLOWED_EXTENSIONS, CATEGORIES
 from data import db_session
 from resources import orders_resources, users_resources, items_resources, \
     categories_resources, suppliers_resources
 from data.secret_key import SECRET_KEY
 
 from data.users import User
-from forms.user import LoginForm, RegisterForm
+from data.items import Item
+from data.categories import Category
+from forms.user import LoginForm, RegisterForm, AddProductForm, \
+    AddSupplierForm
 
 from flask_login import LoginManager, login_user, login_required, \
     logout_user, current_user
@@ -411,8 +415,121 @@ def personal_account():
     abort(404, message=f"User is not authenticated")
 
 
+@app.route("/add_product", methods=['GET', 'POST'])
+def add_product_page():
+    """Страничка добавления товара"""
+
+    # создание формы добавления товаров
+    form = AddProductForm()
+
+    session = db_session.create_session()
+
+    # Проверка id пользователя (доступ только для id == 1)
+    if int(current_user.get_id()) == 1:
+        # Если нажата кнопка отправки формы
+        if form.validate_on_submit():
+            # Есть ли наше изображение в переданном запросе
+            if 'product_image' in request.files:
+                # Имя файла с изображением
+                image = request.files['product_image']
+                # Проверка формата файла:
+                if image.filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS:
+                    # Определяем имя файла на основе id последнего товара в бд
+                    id_amount = len(session.query(Item.id).all())
+                    filename = f"item{id_amount + 1}.png"
+                    # Здесь указывается путь до папки на сервере,
+                    # где будет сохранен файл
+                    path_to_save = os.path.join('./static/img/items', filename)
+                    image.save(path_to_save)
+                else:
+                    return render_template(
+                        'add_product.html', title="Страница управления",
+                        form=form, message="Недопустимый формат изображения"
+                    )
+            # добавляем товар
+            post(
+                'http://localhost:5000/api/items',
+                json={
+                    "name": form.name.data,
+                    "price": float(form.cost.data),
+                    "discount": int(form.discount.data),
+                    "supplier": 1,
+                    "category": session.query(Category).filter(
+                        Category.name == form.category.data
+                    ).first().id,
+                    "min_temp": form.min_temp.data,
+                    "max_temp": form.max_temp.data,
+                    "expiration_date": f"{form.expiration_date.data} дней" # TODO: Сделать логику для неограниченного срока
+                }
+            )
+        # при ошибке ввода цены
+        elif form.cost.data is None and request.files:
+            return render_template(
+                'add_product.html', title="Добавить товар", form=form,
+                cost_error=True
+            )
+
+        return render_template(
+            'add_product.html', title="Добавить товар", form=form
+        )
+
+    abort(404, message=f"No access rights")
+
+
+@app.route("/add_supplier", methods=['GET', 'POST'])
+def add_supplier_page():
+    """Страничка добавления товара"""
+
+    # создание формы добавления товаров
+    form = AddSupplierForm()
+
+    # Проверка id пользователя (доступ только для id == 1)
+    if int(current_user.get_id()) == 1:
+        # Если нажата кнопка отправки формы
+        if form.validate_on_submit():
+
+            # регистрируем поставщика
+            post(
+                'http://localhost:5000/api/suppliers',
+                json={
+                    "name": form.name.data,
+                    "payment_account": form.payment_account.data,
+                    "address": form.payment_account.data,
+                    "mobile_phone": form.mobile_phone.data,
+                    "email": form.email.data
+                }
+            )
+
+        return render_template(
+            'add_supplier.html', title="Регистрация поставщика", form=form
+        )
+
+    abort(404, message=f"No access rights")
+
+
+@app.route("/admin", methods=['GET', 'DELETE', 'POST'])
+def admin():
+    """Страничка админа"""
+
+    # Проверка id пользователя (доступ только для id == 1)
+    if int(current_user.get_id()) == 1:
+        users = get('http://localhost:5000/api/users').json()['users']
+        items = get('http://localhost:5000/api/items').json()['items']
+        suppliers = get(
+            'http://localhost:5000/api/suppliers'
+        ).json()['suppliers']
+
+
+        return render_template(
+            'admin.html', title="Админ", users=users, items=items,
+            suppliers=suppliers
+        )
+
+    abort(404, message=f"No access rights")
+
+
 def main():
-    # Устанавливаем соедениние с БД
+    # Устанавливаем соединение с БД
     db_session.global_init(f'db/{DB_NAME}')
     # Запускаем предложение
     app.run()

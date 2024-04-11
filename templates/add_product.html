@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Добавить товар</h1>
+    <form action="/add_product" method="post" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.product_image.label }}<br>
+            {{ form.product_image(class="form-control", accept=".png") }}
+        </p>
+        <p>
+            {{ form.name.label }}<br>
+            {{ form.name(class="form-control") }}
+        </p>
+        <p>
+            {{ form.cost.label }}<br>
+            {{ form.cost(class="form-control") }}
+            {% if cost_error %}
+                <div class="alert alert-danger" role="alert">
+                    Некорректный формат цены. Нужно ввести вещественное\целое число
+                </div>
+            {% endif %}
+        </p>
+        <p>
+            {{ form.discount.label }}<br>
+            {{ form.discount(class="form-control") }}
+        </p>
+        <p>
+            {{ form.category.label }}<br>
+            {{ form.category(class="form-select") }}
+        </p>
+        <p>
+            {{ form.min_temp.label }}<br>
+            {{ form.min_temp(class="form-control") }}
+        </p>
+        <p>
+            {{ form.max_temp.label }}<br>
+            {{ form.max_temp(class="form-control") }}
+        </p>
+        <p>
+            {{ form.expiration_date.label }}<br>
+            {{ form.expiration_date(class="form-control") }}
+        </p>
+        <p>
+            {{ form.extra_information.label }}<br>
+            {{ form.extra_information(class="form-control") }}
+        </p>
+        <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
+        {% if message|length > 0 %}
+        <div div class="alert alert-warning" role="alert">{{ message }}</div>
+        {% endif %}
+    </form>
+{% endblock %}
