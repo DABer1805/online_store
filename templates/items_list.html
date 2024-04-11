@@ -73,7 +73,7 @@
                                     </a>
                                 </li>
                                 <li class="page-item"><a class="page-link"><span class="noselect" id="cur-item-list-number">1</span></a></li>
-                                <li class="{{ 'page-item disabled' if orders|length == 1 else 'page-item' }}" id="item-list-next-btn-container">
+                                <li class="{{ 'page-item disabled' if items|length <= 6 else 'page-item' }}" id="item-list-next-btn-container">
                                     <a class="page-link" id="item-list-next-btn" aria-label="Next">
                                         <span class="noselect" aria-hidden="true">&raquo;</span>
                                     </a>
