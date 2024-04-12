@@ -203,29 +203,5 @@
             </div>
         </div>
     </div>
-    <script>
-        var firstTabEl = document.querySelector('#myTab li:last-child a');
-        var firstTab = new bootstrap.Tab(firstTabEl);
-
-        firstTab.show();
-    </script>
-    <script>
-        var itemId = $('#data').data()['itemId'];
-        var itemName = $('#data').data()['itemName'];
-        var maxPrice = $('#data').data()['maxPrice'];
-        var catNames = $('#data').data()['catNames'];
-        var catIds = $('#data').data()['catIds'];
-        personalAccountLink = document.getElementsByName(
-            'current_user'
-        )[0];
-        var link = `${personalAccountLink}?from_catalog=true&from_item_page=${itemId}&item_name=${itemName}`;
-        if (maxPrice) {
-            link = link + `&max_price=${maxPrice}`;
-        }
-        if (catNames) {
-            link = link + `&cat_filters=${catNames}`;
-            link = link + `&cat=${catIds}`;
-        }
-        personalAccountLink.setAttribute('href', link);
-    </script>
+    <script src="/static/js/item_page_script.js"></script>
 {% endblock %}

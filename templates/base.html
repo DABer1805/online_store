@@ -25,7 +25,7 @@
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav ms-auto mb-1 mb-lg-0">
                         {% if current_user.is_authenticated %}
-                            <a class="navbar-brand" href="/personal_account" id="{{current_user.id}}" name="current_user">{{ current_user.name }} {{ current_user.surname }}</a>
+                            <a class="navbar-brand" href="{{ '/admin' if current_user.id == 1 else '/personal_account' }}" id="{{current_user.id}}" name="current_user">{{ current_user.name }} {{ current_user.surname }}</a>
                         {% else %}
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#"><i class="far fa-user"></i></a>
@@ -86,7 +86,7 @@
                                             </div>
                                             <div class="modal-footer">
                                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
-                                                <button type="button" class="btn btn-primary">Оплатить</button>
+                                                <button type="button" class="btn btn-primary" id="make_order_btn">Оплатить</button>
                                             </div>
                                         </div>
                                     </div>
@@ -152,6 +152,6 @@
           <img src="/static/img/brand_img.png" style="height: 50px; width: 100px">
       </div>
     </footer>
-    <script src="/static/js/script.js"></script>
+    <script src="/static/js/base_script.js"></script>
     </body>
 </html>

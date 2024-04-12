@@ -11,6 +11,8 @@
                   <a class="list-group-item list-group-item-action" id="list-personal-data-list" data-bs-toggle="list" href="#list-personal-data" role="tab" aria-controls="list-personal-data">Товары</a>
                   <a class="list-group-item list-group-item-action" id="list-suppliers-list" data-bs-toggle="list" href="#list-suppliers" role="tab" aria-controls="list-suppliers">Поставщики</a>
               </div>
+              <!-- Кнопка выхода из профиля -->
+              <a type="button" class="btn btn-primary exit-btn" href="/logout">Выход</a>
           </div>
           <div class="col-md-8 col-sm-12">
               <h1 class="personal_account_title">Админка</h1>
@@ -154,89 +156,7 @@
                     </div>
               </div>
 
-              <script>
-                    function switchButton(btnID) {
-                        var someListItemEl = document.getElementById(btnID);
-                        var tab = new bootstrap.Tab(someListItemEl);
-
-                        tab.show();
-                    }
-
-                    $('#personal-data-btn').on('click', function() {
-                        switchButton('list-personal-data-list');
-                    });
-                    $('#order-history-btn').on('click', function() {
-                        switchButton('list-order-history-list');
-                    });
-                    $('#suppliers-btn').on('click', function() {
-                        switchButton('list-suppliers-list');
-                    });
-
-                    document.querySelectorAll('.delete-user-btn').forEach(button => {
-                        button.addEventListener('click', function(e) {
-                          e.preventDefault();
-                          var userId = this.dataset.userId;
-                          if (confirm('Вы уверены, что хотите удалить пользователя с ID ' + userId + '?')) {
-                            fetch('http://localhost:5000/api/users/' + userId, {
-                              method: 'DELETE',
-                            }).then(response => {
-                              if (response.ok) {
-                                alert('Пользователь удален');
-                                window.location.reload();
-                              }
-                            }).catch(error => {
-                              alert('Ошибка при удалении пользователя: ' + error);
-                            });
-                          }
-                        });
-                    });
-
-                    document.querySelectorAll('.delete-item-btn').forEach(button => {
-                        button.addEventListener('click', function(e) {
-                          e.preventDefault();
-                          var itemId = this.dataset.itemId;
-                        if (confirm('Вы уверены, что хотите удалить товар с ID ' + itemId + '?')) {
-                            fetch('http://localhost:5000/api/items/' + itemId, {
-                              method: 'DELETE',
-                            }).then(response => {
-                              if (response.ok) {
-                                alert('Товар удален');
-                                window.location.reload();
-                           } else {
-                                response.json().then(data => {
-                                  alert('Ошибка при удалении товара: ' + data.message);
-                                });
-                              }
-                            }).catch(error => {
-                              alert('Ошибка при удалении товара: ' + error);
-                            });
-                          }
-                        });
-                    });
-
-                  document.querySelectorAll('.delete-supplier-btn').forEach(button => {
-                  button.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        var supplierId = this.dataset.supplierId;
-                        if (confirm('Вы уверены, что хотите удалить поставщика с ID ' + supplierId + '?')) {
-                              fetch('http://localhost:5000/api/suppliers/' + supplierId, {
-                                method: 'DELETE',
-                              }).then(response => {
-                                if (response.ok) {
-                                  alert('Поставщик удален');
-                                  window.location.reload();
-                                } else {
-                                  response.json().then(data => {
-                                    alert('Ошибка при удалении поставщика: ' + data.message);
-                                  });
-                                }
-                              }).catch(error => {
-                                alert('Ошибка при удалении поставщика: ' + error);
-                              });
-                        }
-                  });
-                });
-              </script>
+              <script src="/static/js/admin_script.js"></script>
           </div>
         </div>
     </div>

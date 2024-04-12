@@ -9,9 +9,9 @@
           data-cat-ids="{{ cat_ids }}">
     <!-- Контейнер со всем содержимым на странице -->
     <div class="container">
-        <!-- Контейнер с бредкрампом -->
+        <!-- Контейнер с бредкрамбом -->
         <div class="row">
-            <!-- Бредкрамп -->
+            <!-- Бредкрамб -->
             <div class="col-12 breadcrumb-container">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="/">Главная</a></li>
@@ -68,6 +68,7 @@
                                     <div class="product-thumb">
                                         <a><img src="/static/img/personal_account_cards/card_1.png"></a>
                                     </div>
+                                    <!-- Заголовок личных данных -->
                                     <div class="catalog-title">
                                         <h3>Личные данные</h3>
                                     </div>
@@ -78,6 +79,7 @@
                                     <div class="product-thumb">
                                         <a><img src="/static/img/personal_account_cards/card_2.png"></a>
                                     </div>
+                                    <!-- Заголовок истории заказов -->
                                     <div class="catalog-title">
                                         <h3>История заказов</h3>
                                     </div>
@@ -90,8 +92,11 @@
                       <!-- Вкладка с личными данными -->
                       <h2>Личные данные</h2>
                       <ul>
+                          <!-- Фамилия -->
                           <li><span class="user-info-title">Фамилия: </span><span class="user-info-data">{{ current_user.name }}</span></li>
+                          <!-- Имя -->
                           <li><span class="user-info-title">Имя: </span><span class="user-info-data">{{ current_user.surname }}</span></li>
+                          <!-- Номер мобильного телефона -->
                           <li><span class="user-info-title">Номер телефона: </span><span class="user-info-data">{{ current_user.mobile_phone }}</span></li>
                       </ul>
                       <!-- Кнопка редактирования -->
@@ -104,12 +109,15 @@
                             <!-- Листалка заказов -->
                             <nav aria-label="Page navigation example">
                               <ul class="pagination justify-content-center">
+                                  <!-- Кнопка "<" -->
                                   <li class="page-item disabled" id="order-prev-btn-container">
                                       <a class="page-link" id="order-prev-btn" aria-label="Previous">
                                           <span class="noselect" aria-hidden="true">&laquo;</span>
                                       </a>
                                   </li>
+                                  <!-- Номер текущего заказа-->
                                   <li class="page-item"><a class="page-link"><span class="noselect" id="cur-order-number">1</span></a></li>
+                                  <!-- Кнопка ">" -->
                                   <li
                                           class="{{ 'page-item disabled' if orders|length == 1 else 'page-item' }}" id="order-next-btn-container">
                                       <a class="page-link" id="order-next-btn" aria-label="Next">
@@ -121,47 +129,83 @@
                             <!-- Собираем таблички с заказами -->
                             {% for order in orders %}
                                 <div class="order-table-container">
+                                    <!-- Табличка с заказом -->
                                     <table name="{{'first' if loop.first else 'last' if loop.last else 'mid'}}"
                                            class="table table-bordered" id="order{{ loop.index }}"
                                            style="{{'display: block;' if loop.first else 'display: none;'}}">
                                         <thead class="table-secondary">
+                                        <!-- Заголовки -->
                                         <tr>
+                                            <!-- Id азказа -->
                                             <th>ID</th>
+                                            <!-- Дата создания -->
                                             <th>Дата создания заказа</th>
+                                            <!-- Дата закрытия (когда курьер привезет заказ) -->
                                             <th>Дата завершения заказа</th>
+                                            <!-- Статус заказа -->
                                             <th colspan="2">Статус</th>
                                         </tr>
                                         </thead>
+                                        <!-- Контент -->
                                         <tbody>
                                             <tr>
+                                                <!-- Id заказа -->
                                                 <th scope="row">{{ order['id'] }}</th>
-                                                <td>{{ order['start_date'] }}</td>
-                                                <td>{{ order['end_date'] }}</td>
+                                                <!-- Дата создания -->
+                                                {% if order['start_date']  %}
+                                                    <td>{{ order['start_date'] }}</td>
+                                                {% else %}
+                                                    <td>-</td>
+                                                {% endif %}
+                                                <!-- Дата закрытия -->
+                                                {% if order['end_date']  %}
+                                                    <td>{{ order['end_date'] }}</td>
+                                                {% else %}
+                                                    <td>-</td>
+                                                {% endif %}
+                                                <!-- Статус -->
                                                 {% if order['is_complited'] %}
                                                     <td class="table-success" colspan="2">Завершен</td>
                                                 {% else %}
                                                     <td class="table-warning" colspan="2">Не завершен</td>
                                                 {% endif %}
                                             </tr>
+                                        <!-- Вторая часть инфо о заказе - товары -->
+                                        <!-- Заголовоки -->
                                         <tr>
+                                            <!-- Список товаров <" -->
                                           <th class="table-secondary" colspan="5">Список товаров</th>
                                         </tr>
                                         <tr class="table-light">
+                                            <!-- Id товара -->
                                             <th>ID</th>
+                                            <!-- Название товара -->
                                             <th>Название</th>
+                                            <!-- Изображение товара -->
                                             <th>Изображение</th>
+                                            <!-- Цена за 1шт -->
                                             <th>Цена за 1шт</th>
+                                            <!-- Количество товара -->
                                             <th>Количество</th>
                                         </tr>
+                                        <!-- Заполняем табличку информацией о товарах -->
                                         {% for item in order['items_list'] %}
+                                            <!-- Инфа о товаре -->
                                             {% set item_data = item['item'] %}
+                                            <!-- Количество -->
                                             {% set amount = item['amount'] %}
+                                            <!-- Цена со скидкой -->
                                             {% set new_price = item_data['price'] * (1 - item_data['discount'] * 0.01) %}
                                             <tr>
+                                                <!-- Id товара -->
                                                 <td>{{ item_data['id'] }}</td>
+                                                <!-- Название товара -->
                                                 <td>{{ item_data['name'] }}</td>
+                                                <!-- Фотка товара -->
                                                 <td class="text-center"><img src="/static/img/items/item{{ item_data['id'] }}.png" alt="" class="basket_img"></td>
+                                                <!-- Цена товара -->
                                                 <td>{{ new_price|round(2) }}</td>
+                                                <!-- Количество товара -->
                                                 <td>{{ amount }}</td>
                                             </tr>
                                         {% endfor %}
@@ -175,140 +219,7 @@
                       {% endif %}
                   </div>
               </div>
-              <script>
-                    var link = '/';
-
-                    var itemId = $('#data').data()['itemId'];
-                    var maxPrice = $('#data').data()['maxPrice'];
-                    var catIds = $('#data').data()['catIds'];
-                    var fromCatalog = $('#data').data()['fromCatalog'];
-
-                    console.log(itemId);
-
-                    if (fromCatalog != 'None') {
-                        link = link + 'catalog';
-                        if (itemId != 'None') {
-                            link = link + `/${itemId}`;
-                            if (maxPrice != 'None') {
-                                link = link + `?max_price=${maxPrice}`;
-                            }
-                            link = link + '&from_item_page=${itemId}';
-                        }
-                        if (maxPrice != 'None') {
-                            link = link + `?max_price=${maxPrice}`;
-                        }
-                        if (catIds != 'None') {
-                            link = link + `&cat=${catIds}`;
-                        }
-                        link = link + '&from_catalog=true';
-                    }
-
-                    returnToPrevPageBtn = document.getElementById(
-                        'return_to_prev_page_btn'
-                    );
-                    returnToPrevPageTxt = document.getElementById(
-                        'return_to_prev_page_txt'
-                    );
-                    itemPageHref = document.getElementById(
-                        'item-page-href'
-                    );
-
-                    returnToPrevPageBtn.setAttribute('href', link);
-                    returnToPrevPageTxt.setAttribute('href', link);
-                    itemPageHref.setAttribute('href', link);
-
-                    var cur_order_id = 1;
-
-                    function switchButton(btnID) {
-                        var someListItemEl = document.getElementById(btnID);
-                        var tab = new bootstrap.Tab(someListItemEl);
-
-                        tab.show();
-                    }
-
-                    function changeCurOrderNumber(curOrderId) {
-                        var curOrderNumber = document.getElementById(
-                            'cur-order-number'
-                        );
-                        curOrderNumber.innerHTML = `${curOrderId}`;
-                    }
-
-                    function toNextOrder() {
-                        var curOrder = document.getElementById(
-                            `order${cur_order_id}`
-                        );
-                        curOrder.style.display = 'none';
-
-                        cur_order_id++;
-                        var nextOrder = document.getElementById(
-                            `order${cur_order_id}`
-                        );
-                        nextOrder.style.display = 'block';
-
-                        changeCurOrderNumber(cur_order_id);
-
-                        prevBtn = document.getElementById(
-                            'order-prev-btn-container'
-                        );
-
-                        nextBtn = document.getElementById(
-                            'order-next-btn-container'
-                        );
-
-                        if (nextOrder.getAttribute('name') == 'last') {
-                            nextBtn.setAttribute(
-                                'class', 'page-item disabled'
-                            );
-                        }
-                        prevBtn.setAttribute('class', 'page-item');
-                    }
-
-                    function toPrevOrder() {
-                        var curOrder = document.getElementById(
-                            `order${cur_order_id}`
-                        );
-                        curOrder.style.display = 'none';
-
-                        cur_order_id--;
-                        var prevOrder = document.getElementById(
-                            `order${cur_order_id}`
-                        );
-                        prevOrder.style.display = 'block';
-
-                        changeCurOrderNumber(cur_order_id);
-
-                        prevBtn = document.getElementById(
-                            'order-prev-btn-container'
-                        );
-
-                        nextBtn = document.getElementById(
-                            'order-next-btn-container'
-                        );
-
-                        if (prevOrder.getAttribute('name') == 'first') {
-                            prevBtn.setAttribute(
-                                'class', 'page-item disabled'
-                            );
-                        }
-                        nextBtn.setAttribute('class', 'page-item');
-                    }
-
-                    $('#personal-account-btn').on('click', function() {
-                        switchButton('list-personal-account-list');
-                    });
-                    $('#personal-data-btn').on('click', function() {
-                        switchButton('list-personal-data-list');
-                    });
-                    $('#order-history-btn').on('click', function() {
-                        switchButton('list-order-history-list');
-                    });
-                    $('#order-next-btn').on('click', function() {
-                        toNextOrder();
-                    });
-                    $('#order-prev-btn').on('click', function() {
-                        toPrevOrder();
-                    });
-              </script>
+              <script src="/static/js/personal_account_script.js"></script>
           </div>
         </div>
     </div>

@@ -6,7 +6,7 @@ from flask_restful import Api
 from requests import get, post
 
 from api import calculate_cost_api, user_basket_api, add_item_to_basket_api, \
-    del_item_in_basket_api
+    del_item_in_basket_api, make_order_api
 from data.constants import DB_NAME, TEST_DB_NAME, MAX_PRICE, \
     ALLOWED_EXTENSIONS, CATEGORIES
 from data import db_session
@@ -76,6 +76,8 @@ app.register_blueprint(user_basket_api.blueprint)
 app.register_blueprint(add_item_to_basket_api.blueprint)
 # Подключаем api удаление товара из корзины
 app.register_blueprint(del_item_in_basket_api.blueprint)
+# Подключаем api для выполнения заказа
+app.register_blueprint(make_order_api.blueprint)
 
 
 @app.route('/logout')
@@ -112,6 +114,9 @@ def login():
         if user and user.check_password(form.password.data):
             # Авторизизуем пользователя
             login_user(user, remember=form.remember_me.data)
+            if user.id == 1:
+                # Перенаправляем пользователя на админку
+                return redirect("/admin")
             # Перенаправляем пользователя на каталог
             return redirect("/")
         # Открываем страничку с формой авторизации и выводим уведомление о

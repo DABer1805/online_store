@@ -1,5 +1,9 @@
-// События для слайдера (перемещение мышки: обычное и с зажатой конпкой)
-const events = ['mousemove', 'touchmove'];
+/*
+    JS скрипт для всего, что связано с базовым шаблоном и добавлением товаров
+    (механизм работы карточек пи корзины связаны друг с другом, да и карточки
+    не только в каталоге используются
+*/
+
 
 // Функция, выполняющая GET запрос
 async function fetchAsync(url) {
@@ -50,7 +54,7 @@ function addItemToBasket(itemId) {
             var basketRow = `<tr id="item${itemId}_cell" class="noselect"> \
                 <td><img src="/static/img/items/item${itemId}.png" \
                  alt="" class="basket_img"></td> \
-                <td><a href="#">${itemName}</a></td> \
+                <td>${itemName}</td> \
                 <td id="item${itemId}_price"> \
                 ${(Math.round(itemPrice * 100) / 100)}₽</td> \
                 <td id="item${itemId}_total_price"> \
@@ -111,6 +115,7 @@ function addItemToBasket(itemId) {
     });
 }
 
+// Удаление товара из корзины
 function delItemInBasket(itemId) {
     // ID пользователя
     var userId = document.getElementsByName('current_user')[0].id;
@@ -166,13 +171,6 @@ function delItemInBasket(itemId) {
     });
 }
 
-// Привязываем функцию изменения текущей цены (фильтр) к слайдеру
-$.each(events, function(k,v) {
-    $('#price_range').on(v, function() {
-        $('#price_text').text($('#price_range').val());
-    });
-})
-
 // Привязываем функцию добавления товара в корзину к соответствующим кнопкам
 // (иконка тележки на карточках товаров)
 $('.add_item_button').on('click', function() {
@@ -191,11 +189,26 @@ $('.add_amount_btn').on('click', function() {
     addItemToBasket(itemId);
 });
 
-// Привязываем функцию удаления товара из корзины к соответствующим кнопкам
-// (кнопки "-" в интерфейсе корзины)
-$('.del_amount_btn').on('click', function() {
-    // ID товара
-    var itemId = this.id.slice(10);
-    // Вызываем функцию удаления товара из корзины
-    delItemInBasket(itemId)
+// Привязываем функцию формирования заказа
+$('#make_order_btn').on('click', function() {
+    // ID пользователя
+    var userId = document.getElementsByName('current_user')[0].id;
+    // Выполняем запрос на формирование заказа
+    fetchAsync(
+        `http://localhost:5000/api/make_order/${userId}`
+    ).then((result) => {;
+        if (result['status'] == 'OK') {
+            // Сообщение о выполнении заказа
+            var messageDiv = `<tr><td class="table-success" role="alert" \
+            id="add_item_message"  colspan="5">Заказ успешно выполнен \
+            </td></tr>`;
+        } else {
+            // Сообщение о пустой корзине
+            var messageDiv = `<tr><td class="table-danger" role="alert" \
+            id="add_item_message"  colspan="5">Корзина пуста!!! \
+            </td></tr>`;
+        }
+        basketTable = document.getElementById('basket_table');
+        basketTable.innerHTML = messageDiv;
+    })
 });
