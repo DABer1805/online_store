@@ -419,13 +419,26 @@ def personal_account():
                 params={'items_list': order['items_list']}
             ).json()['items']
 
+        # Проверяем, авторизован ли пользователь, и если да, то получаем список
+        # тех товаров, которые он выбрал
+        if current_user.is_authenticated:
+            items_list = current_user.items_list
+        else:
+            items_list = ''
+        # Получаем список товаров, которые лежат в корзине пользователя,
+        # включая количество товаров
+        user_basket = get(
+            f'http://{request.host}/api/user_basket',
+            params={'items_list': items_list}
+        ).json()['items']
+
         # Открываем страничку личного кабинета
         return render_template(
             "personal_account.html", title='Продуктовый рай',
             host_data=request.host, orders=orders,
             from_catalog=from_catalog, item_id=item_id,
             cat_filters=cat_filters, cat_ids=cat_ids, item_name=item_name,
-            max_price=max_price
+            max_price=max_price, user_basket=user_basket
         )
 
     # Если пользователь не авторизован, то кидаем ошибку
