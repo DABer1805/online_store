@@ -4,6 +4,9 @@
     не только в каталоге используются
 */
 
+// Адрес сервера
+var hostLink = $('#host-data').data()['host'];
+
 
 // Функция, выполняющая GET запрос
 async function fetchAsync(url) {
@@ -20,7 +23,7 @@ function addItemToBasket(itemId) {
     var userId = document.getElementsByName('current_user')[0].id;
     // Делаем запрос на добавление товара в корзину
     fetchAsync(
-        `http://localhost:5000/api/add_item_to_basket/${itemId}/${userId}`
+        `http://${hostLink}/api/add_item_to_basket/${itemId}/${userId}`
     ).then((result) => {
         // Название товара
         var itemName = result['item']['name'];
@@ -33,9 +36,9 @@ function addItemToBasket(itemId) {
         // Обращаемся к контейнеру для сообщений
         var messageContainer = document.getElementById("message_container");
         // Сообщение о добавлении товара в корзину
-        var messageDiv = `<div class="alert alert-success alert-dismissible \
-        fade show" role="alert" id="add_item_message">Товар "${itemName}" \
-        добавлен в корзину<button type="button" class="btn-close" \
+        var messageDiv = `<div class="alert alert-success alert-dismissible
+        fade show" role="alert" id="add_item_message">Товар "${itemName}"
+        добавлен в корзину<button type="button" class="btn-close"
         data-bs-dismiss="alert" aria-label="Close"></button></div>`;
         // Если в контейнере уже есть сообщение, то удаляем его
         if (messageContainer.querySelector('#add_item_message')) {
@@ -51,33 +54,33 @@ function addItemToBasket(itemId) {
                 "basket_table"
             );
             // Собираем строку таблицы с новым товаром
-            var basketRow = `<tr id="item${itemId}_cell" class="noselect"> \
-                <td><img src="/static/img/items/item${itemId}.png" \
-                 alt="" class="basket_img"></td> \
-                <td>${itemName}</td> \
-                <td id="item${itemId}_price"> \
-                ${(Math.round(itemPrice * 100) / 100)}₽</td> \
-                <td id="item${itemId}_total_price"> \
-                ${(Math.round(itemPrice * itemAmount * 100) / 100)}₽</td> \
-                <td id="item${itemId}_amount"> \
-                <a class="del_amount_btn" id="del_amount${itemId}"> \
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" \
-                    height="16" fill="currentColor" class="bi bi-dash" \
-                    viewBox="0 0 16 16"> \
-                      <path d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 \
-                      1h-7A.5.5 0 0 1 4 8"/> \
-                    </svg></a> <span id="amount_container${itemId}" > \
-                    ${itemAmount}</span> <a class="add_amount_btn" \
-                    id="add_amount${itemId}"> \
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" \
-                    height="16" fill="currentColor" class="bi bi-plus" \
-                    viewBox="0 0 16 16"> \
-                      <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 \
-                      1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 \
-                      0 0 1 8 4z"/> \
-                    </svg> \
-                </a> \
-                </td> \
+            var basketRow = `<tr id="item${itemId}_cell" class="noselect">
+                <td><img src="/static/img/items/item${itemId}.png"
+                 alt="" class="basket_img"></td>
+                <td>${itemName}</td>
+                <td id="item${itemId}_price">
+                ${(Math.round(itemPrice * 100) / 100)}₽</td>
+                <td id="item${itemId}_total_price">
+                ${(Math.round(itemPrice * itemAmount * 100) / 100)}₽</td>
+                <td id="item${itemId}_amount">
+                <a class="del_amount_btn" id="del_amount${itemId}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16"
+                    height="16" fill="currentColor" class="bi bi-dash"
+                    viewBox="0 0 16 16">
+                      <path d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0
+                      1h-7A.5.5 0 0 1 4 8"/>
+                    </svg></a> <span id="amount_container${itemId}" >
+                    ${itemAmount}</span> <a class="add_amount_btn"
+                    id="add_amount${itemId}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16"
+                    height="16" fill="currentColor" class="bi bi-plus"
+                    viewBox="0 0 16 16">
+                      <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0
+                      1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5
+                      0 0 1 8 4z"/>
+                    </svg>
+                </a>
+                </td>
             </tr>`
             // Добавляем в таблицу корзины строку с новым товаром
             basketTable.insertAdjacentHTML('beforeend', basketRow);
@@ -121,7 +124,7 @@ function delItemInBasket(itemId) {
     var userId = document.getElementsByName('current_user')[0].id;
     // Делаем звапрос на кдаления товара из корзины
     fetchAsync(
-        `http://localhost:5000/api/del_item_in_basket_api/${itemId}/${userId}`
+        `http://${hostLink}/api/del_item_in_basket_api/${itemId}/${userId}`
     ).then((result) => {
         // Название товара
         var itemName = result['item']['name'];
@@ -158,9 +161,9 @@ function delItemInBasket(itemId) {
             "message_container"
         );
         // Сообщение об удалении товара из корзины
-        var messageDiv = `<div class="alert alert-danger alert-dismissible \
-        fade show" role="alert" id="add_item_message">Товар "${itemName}" \
-        удалён из корзины<button type="button" class="btn-close" \
+        var messageDiv = `<div class="alert alert-danger alert-dismissible
+        fade show" role="alert" id="add_item_message">Товар "${itemName}"
+        удалён из корзины<button type="button" class="btn-close"
         data-bs-dismiss="alert" aria-label="Close"></button></div>`;
         // Если в контейнере уже есть сообщение, то удаляем его
         if (messageContainer.querySelector('#add_item_message')) {
@@ -189,23 +192,32 @@ $('.add_amount_btn').on('click', function() {
     addItemToBasket(itemId);
 });
 
+// Привязываем функцию добавления товара в корзину к соответствующим кнопкам
+// (кнопки "-" в интерфейсе корзины)
+$('.del_amount_btn').on('click', function() {
+    // ID товара
+    var itemId = this.id.slice(10);
+    // Вызываем функцию добавления товара в корзину
+    delItemInBasket(itemId);
+});
+
 // Привязываем функцию формирования заказа
 $('#make_order_btn').on('click', function() {
     // ID пользователя
     var userId = document.getElementsByName('current_user')[0].id;
     // Выполняем запрос на формирование заказа
     fetchAsync(
-        `http://localhost:5000/api/make_order/${userId}`
+        `http://${hostLink}/api/make_order/${userId}`
     ).then((result) => {;
         if (result['status'] == 'OK') {
             // Сообщение о выполнении заказа
-            var messageDiv = `<tr><td class="table-success" role="alert" \
-            id="add_item_message"  colspan="5">Заказ успешно выполнен \
+            var messageDiv = `<tr><td class="table-success" role="alert"
+            id="add_item_message"  colspan="5">Заказ успешно выполнен
             </td></tr>`;
         } else {
             // Сообщение о пустой корзине
-            var messageDiv = `<tr><td class="table-danger" role="alert" \
-            id="add_item_message"  colspan="5">Корзина пуста!!! \
+            var messageDiv = `<tr><td class="table-danger" role="alert"
+            id="add_item_message"  colspan="5">Корзина пуста!!!
             </td></tr>`;
         }
         basketTable = document.getElementById('basket_table');

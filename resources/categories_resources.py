@@ -66,12 +66,17 @@ class CategoriesListResource(Resource):
 
 def abort_if_category_not_found(category_id):
     """ Если категория не нашлась """
+    # Сессия подключения к БД
     session = db_session.create_session()
+    # Получаем категорию по Id
     category = session.query(Category).get(category_id)
+    # Если не нашлась
     if not category:
+        # Кидаем ошибку
         abort(404, message=f"Category {category_id} not found")
 
 
 # Парсер аргументов новой категории
 parser = reqparse.RequestParser()
+# Название
 parser.add_argument('name', required=True)

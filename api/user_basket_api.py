@@ -19,7 +19,7 @@ def user_basket():
             cur_item = {}
             # Информация о текущем товаре
             item = get(
-                f'http://localhost:5000/api/items/{item_id}'
+                f'http://{request.host}/api/items/{item_id}'
             ).json()['item']
             cur_item['item'] = item
             # Информация о количестве выбранного товара

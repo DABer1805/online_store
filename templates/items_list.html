@@ -118,11 +118,12 @@
                                             <div class="product-card">
                                                 <div class="product-thumb">
                                                     <!-- Фотка товара -->
-                                                    <a href="/catalog/{{ item['id'] }}?from_catalog=true&cat={{ checked_buttons|join(',') }}&max_price={{ max_price }}"><img src="/static/img/items/item{{ item['id'] }}.png"></a>
+                                                    <a
+                                                            href="/catalog/{{ item['id'] }}?from_catalog=true&cat={{ checked_buttons|join(',') }}&max_price={{ cur_price }}"><img src="/static/img/items/item{{ item['id'] }}.png"></a>
                                                 </div>
                                                 <div class="product-details">
                                                     <!-- Название товара -->
-                                                    <h4><a href="/catalog/{{ item['id'] }}?from_catalog=true&cat={{ checked_buttons|join(',') }}&max_price={{ max_price }}">{{ item['name'] }}</a></h4>
+                                                    <h4><a href="/catalog/{{ item['id'] }}?from_catalog=true&cat={{ checked_buttons|join(',') }}&max_price={{ cur_price }}">{{ item['name'] }}</a></h4>
                                                     <div class="product-bottom-details d-flex justify-content-between">
                                                         <div class="product-price">
                                                             <!-- Цена -->
@@ -153,6 +154,7 @@
                             </div>
                         {% endfor %}
                     {% else %}
+                        <!-- Если список товаров пуст -->
                         <h3 style="text-align: center; color: grey">Товары не найдены</h3>
                     {% endif %}
             </div>

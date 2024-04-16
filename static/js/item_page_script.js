@@ -4,13 +4,7 @@
     вкладок: описание, характеристики, состав
 */
 
-// Получаем первую вкладку
-var firstTabEl = document.querySelector('#myTab li:last-child a');
-var firstTab = new bootstrap.Tab(firstTabEl);
-
-// И показываем её
-firstTab.show();
-
+var fromCatalog = $('#data').data()['fromCatalog'];
 // Id текщего заказа
 var itemId = $('#data').data()['itemId'];
 // Название товара
@@ -27,8 +21,8 @@ personalAccountLink = document.getElementsByName(
     'current_user'
 )[0];
 // Собираем ссылку
-var link = `${personalAccountLink}?from_catalog=true&from_item_page= \
-    ${itemId}&item_name=${itemName}`;
+var link = `${personalAccountLink}?from_catalog=true`;
+link = link + `&from_item_page=${itemId}&item_name=${itemName}`;
 // Если есть фильтр максимальной цены
 if (maxPrice) {
     // То добавляем его в ссылку
@@ -40,5 +34,29 @@ if (catNames) {
     link = link + `&cat_filters=${catNames}`;
     link = link + `&cat=${catIds}`;
 }
+
+var prev_link = '/';
+
+if (fromCatalog != 'None') {
+    prev_link = prev_link + `catalog?max_price=${maxPrice}`;
+
+    if (catIds != 'None') {
+        prev_link = prev_link + `&cat=${catIds}`;
+    }
+}
+
+// Стрелочка кнопки возврата
+returnToPrevPageBtn = document.getElementById(
+    'return_to_prev_page_btn'
+);
+// Текст кнопки возврата
+returnToPrevPageTxt = document.getElementById(
+    'return_to_prev_page_txt'
+);
+
+// Меняем ссылку у стрелочки возврата на ту, которую ранее собрали
+returnToPrevPageBtn.setAttribute('href', prev_link);
+// Меняем ссылку у текста возврата на ту, которую ранее собрали
+returnToPrevPageTxt.setAttribute('href', prev_link);
 // Меняем атрибут ссылки у кнопки перехода в личный кабинет
 personalAccountLink.setAttribute('href', link);

@@ -6,7 +6,7 @@
         {{ form.hidden_tag() }}
         <!-- Поле ввода мобильного телефона -->
         <p>
-            {{ form.mobile_phone.label }}<br>
+            <span class="req-marker">*</span>{{ form.mobile_phone.label }}<br>
             {{ form.mobile_phone(class="form-control", type="tel") }}<br>
             {% for error in form.mobile_phone.errors %}
                 <div class="alert alert-danger" role="alert">
@@ -16,7 +16,7 @@
         </p>
         <!-- Поле ввода пароля -->
         <p>
-            {{ form.password.label }}<br>
+            <span class="req-marker">*</span>{{ form.password.label }}<br>
             {{ form.password(class="form-control", type="password") }}<br>
             {% for error in form.password.errors %}
                 <div class="alert alert-danger" role="alert">

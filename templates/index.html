@@ -2,7 +2,9 @@
 
 {% block content %}
     <div class="container-fluid my-carousel">
+		<!-- Карусель с акциями -->
 		<div id="carouselExampleIndicators" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="5000">
+			<!-- Индикаторы -->
 			<div class="carousel-indicators">
 				{% for item in slides %}
 					{% if loop.first %}
@@ -21,6 +23,7 @@
 					{% endif %}
 				{% endfor %}
 			</div>
+			<!-- Все акции -->
 			<div class="carousel-inner">
 				{% for item in slides %}
 					{% if loop.first %}
@@ -34,13 +37,17 @@
 					{% endif %}
 				{% endfor %}
 			</div>
+			<!-- Кнопка "<" -->
 			<button class="carousel-control-prev" type="button"
 					data-bs-target="#carouselExampleIndicators"
-					data-bs-slide="prev">
+					data-bs-slide="prev" style="margin-right:50px;">
 				<span class="carousel-control-prev-icon" aria-hidden="true"></span>
 				<span class="visually-hidden">Previous</span>
 			</button>
-			<button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+			<!-- Кнопка ">" -->
+			<button class="carousel-control-next" type="button"
+					data-bs-target="#carouselExampleIndicators"
+					data-bs-slide="next" style="margin-left:50px;">
 				<span class="carousel-control-next-icon" aria-hidden="true"></span>
 				<span class="visually-hidden">Next</span>
 			</button>
@@ -49,12 +56,15 @@
 	<h2>Каталог</h2>
 	<div class="container">
 		<div class="row">
+			<!-- Карточки с предустановленными фильтрами, которые сразу кидают в каталог -->
 			{% for item in categories %}
 				<div class="col-lg-4 col-md-6 col-sm-12">
 					<div class="product-card">
+						<!-- Название категории -->
 						<div class="catalog-title">
 							<h3>{{ item['name'] }}</h3>
 						</div>
+						<!-- Фотка -->
 						<div class="product-thumb">
 							<a href="{{ item['link'] }}"><img src="/static/img/home_page/cat_{{ loop.index }}.png"></a>
 						</div>
@@ -66,14 +76,17 @@
 	<h2>Товары со скидками</h2>
 	<div id="message_container"></div>
 	<div class="container">
+		<!-- Карусель с товарами по скидке -->
 		<div id="discountedProducts" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
 			<div class="carousel-inner">
+				<!-- Сколько рядов  -->
 				{% set iters_amount = (discounted_items|length / 3)|round(0, 'ceil')|int %}
+				<!-- Сколько карточек в последней вкладке -->
 				{% set last_row = 3 - (iters_amount * 3 - discounted_items|length) %}
 				{% for i in range(iters_amount) %}
 					<div class="{{ 'carousel-item active' if loop.first else 'carousel-item' }}">
 						<div class="row">
-							<!-- Сколько итераций делать на последней строке карусели -->
+							<!-- Сколько итераций делать на последней вкладке карусели -->
 							{% if loop.last %}
 								{% set row_iters_amount = last_row %}
 							{% else %}
@@ -81,15 +94,18 @@
 							{% endif %}
 
 							{% for j in range(row_iters_amount) %}
+								<!-- Инфа о товаре -->
 								{% set item = discounted_items[i * 3 + j] %}
 								<div class="col-lg-4 col-md-6 col-sm-12">
 									<div class="product-card">
+										<!-- Фотка -->
 										<div class="product-thumb">
 											<a href="/catalog/{{ item['id'] }}"><img src="/static/img/items/item{{ item['id'] }}.png"></a>
 										</div>
 										<div class="product-details">
 											<h4><a href="/catalog/{{ item['id'] }}">{{ item['name'] }}</a></h4>
 											<div class="product-bottom-details d-flex justify-content-between">
+												<!-- Цена товара -->
 												<div class="product-price">
 													{% if item['discount'] == 0 %}
 														{{ item['price'] }}₽
@@ -100,8 +116,10 @@
 												</div>
 												<div class="product-links">
 													{% if current_user.is_authenticated %}
+														<!-- Если пользователь авторизован, то кнопка добавляет товар в корзину -->
 														<a class="add_item_button" id="item{{ item['id'] }}"><i class="fas fa-shopping-cart"></i></a>
 													{% else %}
+														<!-- В ином случае кнопка перекидывает на авторизацию -->
 														<a href="/login"><i class="fas fa-shopping-cart"></i></a>
 													{% endif %}
 												</div>

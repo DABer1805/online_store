@@ -28,7 +28,7 @@ if (fromCatalog != 'None') {
             link = link + `?max_price=${maxPrice}`;
         }
         // И добавляем в конец Id товара
-        link = link + '&from_item_page=${itemId}';
+        link = link + `&from_item_page=${itemId}`;
     }
     // Фильтр цены и чисто каталог
     if (maxPrice != 'None') {

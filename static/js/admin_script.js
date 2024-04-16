@@ -2,6 +2,9 @@
     JS скрипт для интерактивных элементов админской страницы
 */
 
+// Адрес сервера
+var hostLink = $('#host-data').data()['host'];
+
 
 // Функция переключения вкладок
 function switchButton(btnID) {
@@ -33,10 +36,10 @@ document.querySelectorAll('.delete-user-btn').forEach(button => {
       // Id пользователя
       var userId = this.dataset.userId;
       // Выводим окно подтверждения
-      if (confirm('Вы уверены, что хотите удалить пользователя с ID ' + \
-        userId + '?')) {
+      if (confirm('Вы уверены, что хотите удалить пользователя с ID ' +
+      userId + '?')) {
             // Выполняем кдаление пользоватедя
-            fetch('http://localhost:5000/api/users/' + userId, {
+            fetch(`http://${hostLink}/api/users/` + userId, {
               method: 'DELETE',
             }).then(response => {
               if (response.ok) {
@@ -60,9 +63,11 @@ document.querySelectorAll('.delete-item-btn').forEach(button => {
         var itemId = this.dataset.itemId;
         // Выводим окно подтверждения
         if (
-            confirm('Вы уверены, что хотите удалить товар с ID ' + itemId + '?')
+            confirm(
+                'Вы уверены, что хотите удалить товар с ID ' + itemId + '?'
+            )
         ) {
-            fetch('http://localhost:5000/api/items/' + itemId, {
+            fetch(`http://${hostLink}/api/items/` + itemId, {
               method: 'DELETE',
             }).then(response => {
               if (response.ok) {
@@ -88,9 +93,9 @@ button.addEventListener('click', function(e) {
         e.preventDefault();
         var supplierId = this.dataset.supplierId;
         // Выводим окно подтверждения
-        if (confirm('Вы уверены, что хотите удалить поставщика с ID ' + \
-          supplierId + '?')) {
-              fetch('http://localhost:5000/api/suppliers/' + supplierId, {
+        if (confirm('Вы уверены, что хотите удалить поставщика с ID ' +
+        supplierId + '?')) {
+              fetch(`http://${hostLink}/api/suppliers/` + supplierId, {
                 method: 'DELETE',
               }).then(response => {
                 if (response.ok) {

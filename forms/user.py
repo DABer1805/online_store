@@ -2,8 +2,26 @@ from flask_wtf import FlaskForm
 from wtforms import PasswordField, StringField, SubmitField, TelField, \
     BooleanField, FileField, FloatField, IntegerField, SelectField, \
     TextAreaField
-from wtforms.validators import DataRequired, Length, NumberRange, Email
-from data.constants import MAX_PRICE, ADD_PRODUCT_CATEGORIES
+from wtforms.validators import DataRequired, Length, NumberRange, \
+    Optional
+
+from data.categories import Category
+from data.constants import MAX_PRICE, DB_NAME
+
+import sys
+import os
+
+# Вот тут пришлось вот такими нехорошими вещами заниматься, т.к. при
+# запуске из коммандной строки файл не видит папку data, так что надо
+# добавить путь к корневой папке приложения следующими 3-мя строчками
+cur_path = os.path.abspath(os.path.dirname(__file__))
+root_path = os.path.split(cur_path)[0]
+sys.path.append(root_path)
+
+from data import db_session
+from data.suppliers import Supplier
+
+db_session.global_init(f'db/{DB_NAME}')
 
 
 class LoginForm(FlaskForm):
@@ -53,6 +71,14 @@ class RegisterForm(FlaskForm):
 class AddProductForm(FlaskForm):
     """Форма добавления продукта"""
 
+    session = db_session.create_session()
+    suppliers_names = [
+        supplier.name for supplier in session.query(Supplier).all()
+    ]
+    categories_names = [
+        category.name for category in session.query(Category).all()
+    ]
+
     # Загрузка изображения товара
     product_image = FileField(
         'Изображение товара', validators=[DataRequired()]
@@ -66,34 +92,86 @@ class AddProductForm(FlaskForm):
     )
     # Скидка
     discount = IntegerField(
-        'Скидка 0-100%', validators=[DataRequired(), NumberRange(0, 100)]
+        'Скидка 0-100%', validators=[Optional(), NumberRange(0, 100)]
     )
-
-    # минимальная температура
-    min_temp = IntegerField(
-        'Минимальная температура хранения',
-        validators=[DataRequired(), NumberRange(-100, 100)]
-    )
-    # максимальная температура
-    max_temp = IntegerField(
-        'Максимальная температура хранения',
-        validators=[DataRequired(), NumberRange(-100, 100)]
-    )
-    # срок годности
-    expiration_date = IntegerField(
-        'Срок годности в днях',
-        validators=[DataRequired(), NumberRange(0, 10000000)]
-    )
-    # Поле дополнительная информация
-    extra_information = TextAreaField('Дополнительная информация')
     # Категория товара
     category = SelectField(
         'Категория товара',
-        choices=ADD_PRODUCT_CATEGORIES,
+        choices=categories_names,
         validators=[DataRequired()]
     )
+    supplier = SelectField(
+        'Поставщик',
+        choices=suppliers_names,
+        validators=[Optional()]
+    )
+    # Бренд товара
+    brand = StringField('Бренд', validators=[Optional()])
+    # Тип продукта
+    type = StringField('Тип продукта', validators=[Optional()])
+    # Тип продукта
+    type_of_packing = StringField('Тип упаковки', validators=[Optional()])
+    # Ширина
+    width = FloatField(
+        'Ширина', validators=[Optional(), NumberRange(0, 10000)]
+    )
+    # Ширина
+    height = FloatField(
+        'Высота', validators=[Optional(), NumberRange(0, 10000)]
+    )
+    # Глубина
+    depth = FloatField(
+        'Глубина', validators=[Optional(), NumberRange(0, 10000)]
+    )
+    # Вес
+    weight = FloatField(
+        'Вес', validators=[Optional(), NumberRange(0, 10000)]
+    )
+    # Емкость
+    capacity = FloatField(
+        'Емкость', validators=[Optional(), NumberRange(0, 10000)]
+    )
+    # Минимальная температура
+    min_temp = IntegerField(
+        'Минимальная температура хранения',
+        validators=[Optional(), NumberRange(-100, 100)]
+    )
+    # Максимальная температура
+    max_temp = IntegerField(
+        'Максимальная температура хранения',
+        validators=[Optional(), NumberRange(-100, 100)]
+    )
+    # Срок годности
+    expiration_date = IntegerField(
+        'Срок годности в днях',
+        validators=[Optional(), NumberRange(0, 10000000)]
+    )
+    # Калории
+    calories = FloatField(
+        'Калории', validators=[Optional(), NumberRange(0, 10000)]
+    )
+    # Белки
+    squirrels = FloatField(
+        'Белки', validators=[Optional(), NumberRange(0, 10000)]
+    )
+    # Жиры
+    fats = FloatField(
+        'Жиры', validators=[Optional(), NumberRange(0, 10000)]
+    )
+    # Углеводы
+    carbohydrates = FloatField(
+        'Углеводы', validators=[Optional(), NumberRange(0, 10000)]
+    )
+    # Поле дополнительная информация
+    extra_information = TextAreaField(
+        'Дополнительная информация', validators=[Optional()]
+    )
+    # Состав
+    composition = TextAreaField(
+        'Состав', validators=[Optional()]
+    )
     # Кнопка отправки формы
-    submit = SubmitField('Добавить товар')
+    submit = SubmitField('Подтвердить')
 
 
 class AddSupplierForm(FlaskForm):
@@ -114,7 +192,7 @@ class AddSupplierForm(FlaskForm):
     )
     # Электронная почта
     email = StringField(
-        'Электронная почта', validators=[DataRequired(), Email()]
+        'Электронная почта', validators=[DataRequired()]
     )
     # Кнопка отправки формы
-    submit = SubmitField('Зарегистрировать')
+    submit = SubmitField('Подтвердить')

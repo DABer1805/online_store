@@ -5,11 +5,12 @@ from flask_cors import CORS, cross_origin
 from flask_restful import Api
 from requests import get, post
 
-from api import calculate_cost_api, user_basket_api, add_item_to_basket_api, \
+from api import user_basket_api, add_item_to_basket_api, \
     del_item_in_basket_api, make_order_api
 from data.constants import DB_NAME, TEST_DB_NAME, MAX_PRICE, \
     ALLOWED_EXTENSIONS, CATEGORIES
 from data import db_session
+from data.suppliers import Supplier
 from resources import orders_resources, users_resources, items_resources, \
     categories_resources, suppliers_resources
 from data.secret_key import SECRET_KEY
@@ -68,8 +69,6 @@ api.add_resource(suppliers_resources.SupplierResource,
 login_manager = LoginManager()
 login_manager.init_app(app)
 
-# Подключаем api подсчета цены покупки
-app.register_blueprint(calculate_cost_api.blueprint)
 # Подключаем api получения товаров из корзины
 app.register_blueprint(user_basket_api.blueprint)
 # Подключаем api добавления товара в корзину
@@ -125,7 +124,9 @@ def login():
                                message="Неправильный логин или пароль",
                                form=form)
     # Открываем страничку с формой авторизации
-    return render_template('login.html', title='Авторизация', form=form)
+    return render_template(
+        'login.html', title='Авторизация', host_data=request.host, form=form
+    )
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -139,9 +140,10 @@ def reqister():
         if form.password.data != form.password_again.data:
             # Открываем страничку с формой и выводим уведомление о
             # некорректности данных
-            return render_template('register.html', title='Регистрация',
-                                   form=form,
-                                   message="Пароли не совпадают")
+            return render_template(
+                'register.html', title='Регистрация', host_data=request.host,
+                form=form, message="Пароли не совпадают"
+            )
         # Создаем сессию подключения к БД
         db_sess = db_session.create_session()
         # Проверяем нет ли в БД пользователя с таким номером
@@ -150,12 +152,13 @@ def reqister():
         ).first():
             # Открываем страничку с формой и выводим уведомление о
             # некорректности данных
-            return render_template('register.html', title='Регистрация',
-                                   form=form,
-                                   message="Такой пользователь уже есть")
+            return render_template(
+                'register.html', title='Регистрация', host_data=request.host,
+                form=form, message="Такой пользователь уже есть"
+            )
         # Добавляем в БД нового пользователя
         post(
-            'http://localhost:5000/api/users',
+            f'http://{request.host}/api/users',
             json={
                 'name': form.name.data,
                 'surname': form.surname.data,
@@ -174,7 +177,10 @@ def reqister():
         # Перенаправляем на форму авторизации
         return redirect('/login')
     # Открываем страничку с формой регистрации
-    return render_template('register.html', title='Регистрация', form=form)
+    return render_template(
+        'register.html', title='Регистрация', host_data=request.host,
+        form=form
+    )
 
 
 @app.route('/change_user_data', methods=['GET', 'POST'])
@@ -219,11 +225,12 @@ def change_user_data():
             # Проверяем нет ли в БД пользователя с таким номером
             if db_sess.query(User).filter(
                     User.mobile_phone == form.mobile_phone.data
-            ).first():
+            ).count() > 1:
                 # Открываем страничку с формой и выводим уведомление о
                 # некорректности данных
                 return render_template(
-                    'register.html', title='Регистрация', form=form,
+                    'register.html', title='Регистрация',
+                    host_data=request.host, form=form,
                     message="Такой пользователь уже есть"
                 )
             # Переприсваиваем поле с номером телефона
@@ -242,7 +249,10 @@ def change_user_data():
             # Кидаем ошибку
             abort(404)
     # Открываем страничку с формочкой
-    return render_template('register.html', title='Регистрация', form=form)
+    return render_template(
+        'register.html', title='Регистрация', host_data=request.host,
+        form=form
+    )
 
 
 @app.route("/catalog", methods=['GET', 'POST'])
@@ -271,7 +281,7 @@ def catalog():
         checked_buttons += list(map(int, cat.split(',')))
         cat_filters = ', '.join(
             map(lambda x: get(
-                f'http://localhost:5000/api/categories/{x}'
+                f'http://{request.host}/api/categories/{x}'
             ).json()['name'], cat.split(','))
         )
     # Устанавливаем в параметрах ограничение по цене - текущую цену на
@@ -293,29 +303,30 @@ def catalog():
     # Получаем список товаров, которые лежат в корзине пользователя,
     # включая количество товаров
     user_basket = get(
-        'http://localhost:5000/api/user_basket',
+        f'http://{request.host}/api/user_basket',
         params={'items_list': items_list}
     ).json()['items']
     # Получаем список всех товаров с учетом параметров
     items = get(
-        'http://localhost:5000/api/items', params=params
+        f'http://{request.host}/api/items', params=params
     ).json()['items']
     # Получаем список всех категорий
     categories = get(
-        'http://localhost:5000/api/categories'
+        f'http://{request.host}/api/categories'
     ).json()['items']
     # Открываем страничку с каталогом
     return render_template(
-        "items_list.html", title='Продуктовый рай', cur_price=cur_price,
-        checked_buttons=checked_buttons, items=items, categories=categories,
-        cat_filters=cat_filters, max_price=MAX_PRICE, user_basket=user_basket
+        "items_list.html", title='Продуктовый рай', host_data=request.host,
+        cur_price=cur_price, checked_buttons=checked_buttons, items=items,
+        categories=categories, cat_filters=cat_filters,
+        max_price=MAX_PRICE, user_basket=user_basket
     )
 
 
 @app.route("/catalog/<int:item_id>")
 def item_page(item_id):
     # Получаем инфо о выбранном предмете
-    item = get(f'http://localhost:5000/api/items/{item_id}').json()['item']
+    item = get(f'http://{request.host}/api/items/{item_id}').json()['item']
     # Категории предыдущей страницы каталога
     cat = request.args.get('cat')
     # Если открыта страница товара из каталога
@@ -329,7 +340,7 @@ def item_page(item_id):
     if cat:
         categories = {
             'names': ', '.join(map(lambda x: get(
-                f'http://localhost:5000/api/categories/{x}'
+                f'http://{request.host}/api/categories/{x}'
             ).json()['name'], cat.split(','))),
             'ids': cat
         }
@@ -344,13 +355,13 @@ def item_page(item_id):
     # Получаем список товаров, которые лежат в корзине пользователя,
     # включая количество товаров
     user_basket = get(
-        'http://localhost:5000/api/user_basket',
+        f'http://{request.host}/api/user_basket',
         params={'items_list': items_list}
     ).json()['items']
     return render_template(
-        "item_page.html", title='Продуктовый рай', item=item,
-        categories=categories, max_price=max_price, from_catalog=from_catalog,
-        user_basket=user_basket
+        "item_page.html", title='Продуктовый рай', host_data=request.host,
+        item=item, categories=categories, max_price=max_price,
+        from_catalog=from_catalog, user_basket=user_basket
     )
 
 
@@ -358,7 +369,7 @@ def item_page(item_id):
 def home_page():
     slides = os.listdir(url_for("static", filename="img/slides")[1:])
     discounted_items = get(
-        'http://localhost:5000/api/items', params={'only_discount': True}
+        f'http://{request.host}/api/items', params={'only_discount': True}
     ).json()['items']
     # Проверяем, авторизован ли пользователь, и если да, то получаем список
     # тех товаров, которые он выбрал
@@ -369,13 +380,13 @@ def home_page():
     # Получаем список товаров, которые лежат в корзине пользователя,
     # включая количество товаров
     user_basket = get(
-        'http://localhost:5000/api/user_basket',
+        f'http://{request.host}/api/user_basket',
         params={'items_list': items_list}
     ).json()['items']
     return render_template(
-        "index.html", title='Продуктовый рай', slides=slides,
-        categories=CATEGORIES, discounted_items=discounted_items,
-        user_basket=user_basket
+        "index.html", title='Продуктовый рай', host_data=request.host,
+        slides=slides, categories=CATEGORIES,
+        discounted_items=discounted_items, user_basket=user_basket
     )
 
 
@@ -385,7 +396,7 @@ def personal_account():
         # Если страница открыта из каталога
         from_catalog = request.args.get('from_catalog')
         # Если открыта страница из товарной страницы
-        from_item_page = request.args.get('from_item_page')
+        item_id = request.args.get('from_item_page')
         # Названия фильтров
         cat_filters = request.args.get('cat_filters')
         # id фильтров
@@ -397,21 +408,22 @@ def personal_account():
 
         # Получаем все заказы
         orders = get(
-            'http://localhost:5000/api/orders',
+            f'http://{request.host}/api/orders',
             params={'user_id': current_user.id}
         ).json()['orders']
 
         # Еще на каддый товар из списка получаем детальную информацию
         for order in orders:
             order['items_list'] = get(
-                'http://localhost:5000/api/user_basket',
+                f'http://{request.host}/api/user_basket',
                 params={'items_list': order['items_list']}
             ).json()['items']
 
         # Открываем страничку личного кабинета
         return render_template(
-            "personal_account.html", title='Продуктовый рай', orders=orders,
-            from_catalog=from_catalog, from_item_page=from_item_page,
+            "personal_account.html", title='Продуктовый рай',
+            host_data=request.host, orders=orders,
+            from_catalog=from_catalog, item_id=item_id,
             cat_filters=cat_filters, cat_ids=cat_ids, item_name=item_name,
             max_price=max_price
         )
@@ -427,12 +439,11 @@ def add_product_page():
     # создание формы добавления товаров
     form = AddProductForm()
 
-    session = db_session.create_session()
-
     # Проверка id пользователя (доступ только для id == 1)
-    if int(current_user.get_id()) == 1:
+    if current_user.id == 1:
         # Если нажата кнопка отправки формы
         if form.validate_on_submit():
+            session = db_session.create_session()
             # Есть ли наше изображение в переданном запросе
             if 'product_image' in request.files:
                 # Имя файла с изображением
@@ -444,7 +455,8 @@ def add_product_page():
                     filename = f"item{id_amount + 1}.png"
                     # Здесь указывается путь до папки на сервере,
                     # где будет сохранен файл
-                    path_to_save = os.path.join('./static/img/items', filename)
+                    path_to_save = os.path.join('./static/img/items',
+                                                filename)
                     image.save(path_to_save)
                 else:
                     return render_template(
@@ -453,32 +465,201 @@ def add_product_page():
                     )
             # добавляем товар
             post(
-                'http://localhost:5000/api/items',
+                f'http://{request.host}/api/items',
                 json={
                     "name": form.name.data,
                     "price": float(form.cost.data),
-                    "discount": int(form.discount.data),
-                    "supplier": 1,
+                    "discount": (
+                        int(form.discount.data)
+                        if form.discount.data else 0
+                    ),
+                    "supplier": session.query(Supplier).filter(
+                        Supplier.name == form.supplier.data
+                    ).first().id,
                     "category": session.query(Category).filter(
                         Category.name == form.category.data
                     ).first().id,
-                    "min_temp": form.min_temp.data,
-                    "max_temp": form.max_temp.data,
-                    "expiration_date": f"{form.expiration_date.data} дней" # TODO: Сделать логику для неограниченного срока
+                    "brand": form.brand.data,
+                    "type": form.type.data,
+                    "type_of_packing": form.type_of_packing.data,
+                    "width": form.width.data,
+                    "height": form.height.data,
+                    "depth": form.depth.data,
+                    "weight": form.weight.data,
+                    "min_temp": (
+                        form.min_temp.data if form.min_temp.data else '0'
+                    ),
+                    "max_temp": (
+                        form.max_temp.data if form.max_temp.data else '0'
+                    ),
+                    "expiration_date": (
+                        f"{form.expiration_date.data} дней"
+                        if form.expiration_date.data else 'Не ограничен'
+                    ),
+                    "calories": form.calories.data,
+                    "squirrels": form.squirrels.data,
+                    "fats": form.fats.data,
+                    "carbohydrates": form.carbohydrates.data,
+                    "description": form.extra_information.data,
+                    "composition": form.composition.data,
                 }
             )
-        # при ошибке ввода цены
-        elif form.cost.data is None and request.files:
-            return render_template(
-                'add_product.html', title="Добавить товар", form=form,
-                cost_error=True
-            )
+            return redirect('/admin')
 
         return render_template(
-            'add_product.html', title="Добавить товар", form=form
+            'add_product.html', title="Добавить товар",
+            host_data=request.host, form=form
         )
 
     abort(404, message=f"No access rights")
+
+
+@app.route("/update_product/<int:item_id>", methods=['GET', 'POST'])
+def update_product_page(item_id):
+    """ Редактирование данных о товаре """
+    form = AddProductForm()
+    # Подгрузка текущей инфы в поля формочки
+    if request.method == "GET":
+        # Сессия подключения к БД
+        db_sess = db_session.create_session()
+        # Достаём товар из БД
+        item = db_sess.query(Item).filter(Item.id == item_id).first()
+        # Если нашелся
+        if item:
+            # Заполяняем поле с названием товара
+            form.name.data = item.name
+            # Заполяняем поле с ценой
+            form.cost.data = item.price
+            # Заполняем поле со скидкой
+            form.discount.data = item.discount
+            # Заполняем поле с категориями
+            form.category.data = item.category
+            # Заполняем поле с поставщиком
+            form.supplier.data = item.supplier
+            # Заполняем поле с брендом
+            form.brand.data = item.brand
+            # Заполняем поле с типом товара
+            form.type.data = item.type
+            # Заполняем поле с типом упаковки
+            form.type_of_packing.data = item.type_of_packing
+            # Заполняем поле с шириной
+            form.width.data = item.width
+            # Заполняем поле с высотой
+            form.height.data = item.height
+            # Заполняем поле с глубиной
+            form.depth.data = item.depth
+            # Заполняем поле с весом
+            form.weight.data = item.weight
+            # Заполняем поле с ёмкостью
+            form.capacity.data = item.capacity
+            # Заполняем поле с минимальной температурой
+            form.min_temp.data = item.min_temp
+            # Заполняем поле с максимальной температурой
+            form.max_temp.data = item.max_temp
+            # Заполняем поле со сроком годности
+            form.expiration_date.data = item.expiration_date
+            # Заполняем поле с калориями
+            form.calories.data = item.calories
+            # Заполняем поле с белками
+            form.squirrels.data = item.squirrels
+            # Заполняем поле с жирами
+            form.fats.data = item.fats
+            # Заполняем поле с углеводами
+            form.carbohydrates.data = item.carbohydrates
+            # Заполняем поле с описанием
+            form.extra_information.data = item.description
+            # Заполняем поле с составом
+            form.composition.data = item.composition
+        else:
+            # Кидаем ошибку
+            abort(404)
+    # Если пользователь нажал на кнопку
+    if form.validate_on_submit():
+        # Сессия подключения к БД
+        session = db_session.create_session()
+        # Достаём товар из БД
+        item = session.query(Item).filter(Item.id == item_id).first()
+        # Если нашелся
+        if item:
+            # Имя файла с изображением
+            image = request.files['product_image']
+            # Проверка формата файла:
+            if image.filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS:
+                filename = f"item{item.id}.png"
+                # Здесь указывается путь до папки на сервере,
+                # где будет сохранен файл
+                path_to_save = os.path.join('./static/img/items',
+                                            filename)
+                image.save(path_to_save)
+            # Переписываем поле с названием товара
+            item.name = form.name.data
+            # Переписываем поле с ценой
+            item.price = float(form.cost.data)
+            # Переписываем поле со скидкой
+            item.discount = (
+                int(form.discount.data)
+                if form.discount.data else 0
+            )
+            # Переписываем поле с поставщиком
+            item.supplier = session.query(Supplier).filter(
+                Supplier.name == form.supplier.data
+            ).first().id,
+            # Переписываем поле с категориями
+            item.category = session.query(Category).filter(
+                Category.name == form.category.data
+            ).first().id
+            # Переписываем поле с брендом
+            item.brand = form.brand.data
+            # Переписываем поле с типом товара
+            item.type = form.type.data
+            # Переписываем поле с типом упаковки
+            item.type_of_packing = form.type_of_packing.data
+            # Переписываем поле с шириной
+            item.width = form.width.data
+            # Переписываем поле с высотой
+            item.height = form.height.data
+            # Переписываем поле с глубиной
+            item.depth = form.depth.data
+            # Переписываем поле с весом
+            item.weight = form.weight.data
+            # Переписываем поле с ёмкостью
+            item.capacity = form.capacity.data
+            # Переписываем поле с минимальной температурой
+            item.min_temp = (
+                form.min_temp.data if form.min_temp.data else '0'
+            ),
+            # Переписываем поле с максимальной температурой
+            item.max_temp = (
+                form.max_temp.data if form.max_temp.data else '0'
+            ),
+            # Переписываем поле со сроком годности
+            item.expiration_date = (
+                f"{form.expiration_date.data} дней"
+                if form.expiration_date.data else 'Не ограничен'
+            ),
+            # Переписываем поле с калориями
+            item.calories = form.calories.data
+            # Переписываем поле с белками
+            item.squirrels = form.squirrels.data
+            # Переписываем поле с жирами
+            item.fats = form.fats.data
+            # Переписываем поле с углеводами
+            item.carbohydrates = form.carbohydrates.data
+            # Переписываем поле с описанием
+            item.description = form.extra_information.data
+            # Переписываем поле с составом
+            item.composition = form.composition.data
+            # Коммитим
+            session.commit()
+            # Перенаправляем в личный кабинет
+            return redirect('/admin')
+        else:
+            # Кидаем ошибку
+            abort(404)
+    return render_template(
+        'add_product.html', title='Редактирование товара',
+        host_data=request.host, form=form
+    )
 
 
 @app.route("/add_supplier", methods=['GET', 'POST'])
@@ -492,10 +673,9 @@ def add_supplier_page():
     if int(current_user.get_id()) == 1:
         # Если нажата кнопка отправки формы
         if form.validate_on_submit():
-
             # регистрируем поставщика
             post(
-                'http://localhost:5000/api/suppliers',
+                f'http://{request.host}/api/suppliers',
                 json={
                     "name": form.name.data,
                     "payment_account": form.payment_account.data,
@@ -504,12 +684,75 @@ def add_supplier_page():
                     "email": form.email.data
                 }
             )
+            return redirect('/admin')
 
         return render_template(
-            'add_supplier.html', title="Регистрация поставщика", form=form
+            'add_supplier.html', title="Регистрация поставщика",
+            host_data=request.host, form=form
         )
 
     abort(404, message=f"No access rights")
+
+
+@app.route("/update_supplier/<int:supplier_id>", methods=['GET', 'POST'])
+def update_supplier_page(supplier_id):
+    """ Редактирование данных пользователя """
+    form = AddSupplierForm()
+    # Подгрузка текущей инфы в поля формочки
+    if request.method == "GET":
+        # Сессия подключения к БД
+        db_sess = db_session.create_session()
+        # Достаём нашего пользователя из БД
+        supplier = db_sess.query(Supplier).filter(
+            Supplier.id == supplier_id
+        ).first()
+        # Если нашелся
+        if supplier:
+            # Заполняем поле с именем
+            form.name.data = supplier.name
+            # Заполняем поле с расчетным счетом
+            form.payment_account.data = supplier.payment_account
+            # Заполняем поле с адресом
+            form.address.data = supplier.address
+            # Заполняем поле с мобильным телефоном
+            form.mobile_phone.data = supplier.mobile_phone
+            # Заполняем поле с электронной почтой
+            form.email.data = supplier.email
+        else:
+            # Кидаем ошибку
+            abort(404)
+    # Если пользователь нажал на кнопку
+    if form.validate_on_submit():
+        # Сессия подключения к БД
+        db_sess = db_session.create_session()
+        # Достаём нашего пользователя из БД
+        supplier = db_sess.query(Supplier).filter(
+            Supplier.id == supplier_id
+        ).first()
+        # Если нашелся
+        if supplier:
+            # Заполняем поле с именем
+            supplier.name = form.name.data
+            # Заполняем поле с расчетным счетом
+            supplier.payment_account = form.payment_account.data
+            # Заполняем поле с адресом
+            supplier.address = form.address.data
+            # Заполняем поле с мобильным телефоном
+            supplier.mobile_phone = form.mobile_phone.data
+            # Заполняем поле с электронной почтой
+            supplier.email = form.email.data
+            # Коммитим
+            db_sess.commit()
+            # Перенаправляем в личный кабинет
+            return redirect('/admin')
+        else:
+            # Кидаем ошибку
+            abort(404)
+    # Открываем страничку с формочкой
+    return render_template(
+        'add_supplier.html', title='Редактирование поставщика',
+        host_data=request.host, form=form
+    )
 
 
 @app.route("/admin", methods=['GET', 'DELETE', 'POST'])
@@ -518,16 +761,15 @@ def admin():
 
     # Проверка id пользователя (доступ только для id == 1)
     if int(current_user.get_id()) == 1:
-        users = get('http://localhost:5000/api/users').json()['users']
-        items = get('http://localhost:5000/api/items').json()['items']
+        users = get(f'http://{request.host}/api/users').json()['users']
+        items = get(f'http://{request.host}/api/items').json()['items']
         suppliers = get(
-            'http://localhost:5000/api/suppliers'
+            f'http://{request.host}/api/suppliers'
         ).json()['suppliers']
 
-
         return render_template(
-            'admin.html', title="Админ", users=users, items=items,
-            suppliers=suppliers
+            'admin.html', title="Админ", host_data=request.host, users=users,
+            items=items, suppliers=suppliers
         )
 
     abort(404, message=f"No access rights")

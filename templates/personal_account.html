@@ -3,8 +3,9 @@
 
 {% block content %}
     <!--  Служебные данные для сборки ссылок -->
-    <meta id="data" data-from-catalog="{{ from_catalog }}"
-          data-item-id="{{ from_item_page }}"
+    <meta id="data"
+          data-from-catalog="{{ from_catalog }}"
+          data-item-id="{{ item_id }}"
           data-max-price="{{ max_price }}"
           data-cat-ids="{{ cat_ids }}">
     <!-- Контейнер со всем содержимым на странице -->
@@ -19,10 +20,10 @@
                         <li class="breadcrumb-item"><a href="/catalog">Каталог</a></li>
                     {% endif %}
                     {% if cat_filters %}
-                        <li class="breadcrumb-item"><a href="/catalog?cat={{ cat_ids }}">{{ cat_filters }}</a></li>
+                        <li class="breadcrumb-item"><a href="/catalog?cat={{ cat_ids }}&max_price={{ max_price }}">{{ cat_filters }}</a></li>
                     {% endif %}
-                    {% if from_item_page %}
-                        <li class="breadcrumb-item"><a href="/catalog" id="item-page-href">{{ item_name }}</a></li>
+                    {% if item_id %}
+                        <li class="breadcrumb-item"><a href="/catalog/{{ item_id }}?cat={{ cat_ids }}&max_price={{ max_price }}" id="item-page-href">{{ item_name }}</a></li>
                     {% endif %}
                     <li class="breadcrumb-item active" aria-current="page">Личный кабинет</li>
                 </ol>

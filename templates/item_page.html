@@ -1,7 +1,10 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <meta id="data" data-item-id="{{ item['id'] }}"
+    <!-- Служебные данные для сбора ссылки -->
+    <meta id="data"
+          data-from-catalog="{{ from_catalog }}"
+          data-item-id="{{ item['id'] }}"
           data-item-name="{{ item['name'] }}"
           data-max-price="{{ max_price }}"
           data-cat-names="{{ categories['names'] }}"
@@ -9,6 +12,7 @@
     <div class="container">
         <div class="row">
             <div class="col-12 breadcrumb-container">
+                <!-- Бредкрамб -->
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="/">Главная</a></li>
                     {% if from_catalog %}
@@ -23,30 +27,26 @@
         </div>
         <div class="row">
             <div class="col-12 return-to-catalog">
-                {% if from_catalog %}
-                    {% if categories %}
-                        {% set link = "/catalog?cat={{ categories['ids'] }}&max_price={{ max_price }}" %}
-                    {% else %}
-                        {% set link = "/catalog" %}
-                    {% endif %}
-                {% else %}
-                    {% set link = "/" %}
-                {% endif %}
-                <a href="{{ link }}">
+                <!-- Кнопка возврата -->
+                <a href="/catalog" id="return_to_prev_page_btn">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-double-left" viewBox="0 0 16 16">
                         <path fill-rule="evenodd" d="M8.354 1.646a.5.5 0 0 1 0 .708L2.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"/>
                         <path fill-rule="evenodd" d="M12.354 1.646a.5.5 0 0 1 0 .708L6.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"/>
                     </svg>
                 </a>
-                <a href="{{ link }}">Обратно</a>
+                <!-- Текст возврата -->
+                <a href="/catalog" id="return_to_prev_page_txt">Обратно</a>
             </div>
         </div>
         <div class="row">
             <div class="col-md-6 col-sm-12 item-img-container">
+                <!-- Фотка товара -->
                 <img src="/static/img/items/item{{ item['id'] }}.png" class="item_img">
             </div>
             <div class="col-md-6 col-sm-12">
+                <!-- Название товара -->
                 <h2 class="item_title">{{ item['name'] }}</h2>
+                <!-- Цена товара + скидка -->
                 <div class="product-price-item border rounded">
                     {% if item['discount'] == 0 %}
                     {{ item['price'] }}₽
@@ -55,15 +55,19 @@
                     {{ new_price|round(2) }}₽ <small>{{ item['price'] }}₽</small>
                     {% endif %}
                 </div>
+                <!-- Название товара -->
                 <ul class="nav nav-tabs item-tabs" id="myTab" role="tablist">
+                    <!-- Переключатель "Характеристики" -->
                     <li class="nav-item" role="presentation">
                         <button class="nav-link active" id="specifications-tab" data-bs-toggle="tab" data-bs-target="#specifications" type="button" role="tab" aria-controls="home" aria-selected="true">Характеристики</button>
                     </li>
+                    <!-- Переключатель "Описание" -->
                     {% if item['description'] %}
                         <li class="nav-item" role="presentation">
                             <button class="nav-link" id="description-tab" data-bs-toggle="tab" data-bs-target="#description" type="button" role="tab" aria-controls="description" aria-selected="false">Описание</button>
                         </li>
                     {% endif %}
+                    <!-- Переключатель "Состав" -->
                     {% if item['composition'] %}
                         <li class="nav-item" role="presentation">
                             <button class="nav-link" id="composition-tab" data-bs-toggle="tab" data-bs-target="#composition" type="button" role="tab" aria-controls="composition" aria-selected="false">Состав</button>
@@ -72,10 +76,13 @@
                 </ul>
 
                 <div class="tab-content item-tab-content">
+                    <!-- Вкладка с характеристиками -->
                     <div class="tab-pane active" id="specifications" role="tabpanel" aria-labelledby="specifications-tab">
+                        <!-- Табличка пищевой ценности -->
                         {% if (item['calories'], item['squirrels'], item['fats'], item['carbohydrates'])|select|first %}
                             <h5>Пищевая ценность в 100 граммах</h5>
                             <div class="nutritional-value-table">
+                                <!-- Калории -->
                                 <div class="nutritional-value-table-item">
                                     <div class="nutritional-value-table-count">
                                         {% if item['calories'] %}
@@ -88,6 +95,7 @@
                                         ккал
                                     </div>
                                 </div>
+                                <!-- Белки -->
                                 <div class="nutritional-value-table-item">
                                     <div class="nutritional-value-table-count">
                                         {% if item['squirrels'] %}
@@ -100,6 +108,7 @@
                                         белки
                                     </div>
                                 </div>
+                                <!-- Жиры -->
                                 <div class="nutritional-value-table-item">
                                     <div class="nutritional-value-table-count">
                                         {% if item['fats'] %}
@@ -112,6 +121,7 @@
                                         жиры
                                     </div>
                                 </div>
+                                <!-- Углеводы -->
                                  <div class="nutritional-value-table-item">
                                     <div class="nutritional-value-table-count">
                                         {% if item['carbohydrates'] %}
@@ -126,50 +136,61 @@
                                 </div>
                             </div>
                         {% endif %}
+                        <!-- Заголовок характеристик -->
                         <h5 style="padding-top: 20px">Характеристики</h5>
+                        <!-- Табличка с характеристиками -->
                         <div class="features-table">
+                            <!-- Тут куча проверок, т.к. если характеристика не указана, то она не отображается -->
+                            <!-- Бренд -->
                             {% if item['brand'] %}
                                 <div class="feature-table-cell">
                                     <div class="feature-title">Бренд</div>
                                     <div>{{ item['brand'] }}</div>
                                 </div>
                             {% endif %}
+                            <!-- Поставщик -->
                             {% if item['supplier'] %}
                                 <div class="feature-table-cell">
                                     <div class="feature-title">Производитель</div>
                                     <div>{{ item['supplier'] }}</div>
                                 </div>
                             {% endif %}
+                            <!-- Тип товара -->
                             {% if item['type'] %}
                                 <div class="feature-table-cell">
                                     <div class="feature-title">Вид продукта</div>
                                     <div>{{ item['type'] }}</div>
                                 </div>
                             {% endif %}
+                            <!-- Тип упаковки -->
                             {% if item['type_of_packing'] %}
                                 <div class="feature-table-cell">
                                     <div class="feature-title">Тип упаковки</div>
                                     <div>{{ item['type_of_packing'] }}</div>
                                 </div>
                             {% endif %}
+                            <!-- Ширина -->
                             {% if item['width'] %}
                                 <div class="feature-table-cell">
                                     <div class="feature-title">Ширина, см</div>
                                     <div>{{ item['width'] }}</div>
                                 </div>
                             {% endif %}
+                            <!-- Высота -->
                             {% if item['height'] %}
                                 <div class="feature-table-cell">
                                     <div class="feature-title">Высота, см</div>
                                     <div>{{ item['height'] }}</div>
                                 </div>
                             {% endif %}
+                            <!-- Глубина -->
                             {% if item['depth'] %}
                                 <div class="feature-table-cell">
                                     <div class="feature-title">Глубина, см</div>
                                     <div>{{ item['depth'] }}</div>
                                 </div>
                             {% endif %}
+                            <!-- Ёмкость -->
                             {% if item['capacity'] %}
                                 <div class="feature-table-cell">
                                     <div class="feature-title">Eмкость, л</div>
@@ -177,25 +198,31 @@
                                 </div>
                             {% endif %}
                         </div>
+                        <!-- Условия хранения -->
                         <h5 style="padding-top: 20px">Условия хранения</h5>
                         <div class="features-table">
+                            <!-- Минимальная температура -->
                             <div class="feature-table-cell">
                                 <div class="feature-title">Мин. температура хранения, °C</div>
                                 <div>{{ item['min_temp'] }}</div>
                             </div>
+                            <!-- Максимальная температура хранения -->
                             <div class="feature-table-cell">
                                 <div class="feature-title">Макс. температура хранения, °C</div>
                                 <div>{{ item['max_temp'] }}</div>
                             </div>
+                            <!-- Срок годности -->
                             <div class="feature-table-cell">
                                 <div class="feature-title">Срок годности</div>
                                 <div>{{ item['expiration_date'] }}</div>
                             </div>
                         </div>
                     </div>
+                    <!-- Описание -->
                     {% if item['description'] %}
                         <div class="tab-pane" id="description" role="tabpanel" aria-labelledby="description-tab">{{ item['description'] }}</div>
                     {% endif %}
+                    <!-- Состав -->
                     {% if item['composition'] %}
                         <div class="tab-pane" id="composition" role="tabpanel" aria-labelledby="composition-tab">{{ item['composition'] }}</div>
                     {% endif %}

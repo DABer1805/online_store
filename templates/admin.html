@@ -5,9 +5,10 @@
         <div class="row">
           <div class="col-md-4 col-sm-12">
               <h2 class="personal_account_title">Инструменты</h2>
+              <!-- Переключатель вкладок -->
               <div class="list-group" id="list-tab" role="tablist">
                   <a class="list-group-item list-group-item-action active" id="list-home-list" data-bs-toggle="list" href="#list-home" role="tab" aria-controls="list-home">Данные</a>
-                   <a class="list-group-item list-group-item-action" id="list-order-history-list" data-bs-toggle="list" href="#list-order-history" role="tab" aria-controls="list-order-history">Пользователи</a>
+                  <a class="list-group-item list-group-item-action" id="list-order-history-list" data-bs-toggle="list" href="#list-order-history" role="tab" aria-controls="list-order-history">Пользователи</a>
                   <a class="list-group-item list-group-item-action" id="list-personal-data-list" data-bs-toggle="list" href="#list-personal-data" role="tab" aria-controls="list-personal-data">Товары</a>
                   <a class="list-group-item list-group-item-action" id="list-suppliers-list" data-bs-toggle="list" href="#list-suppliers" role="tab" aria-controls="list-suppliers">Поставщики</a>
               </div>
@@ -18,13 +19,16 @@
               <h1 class="personal_account_title">Админка</h1>
               <div class="tab-content" id="nav-tabContent">
                   <div class="tab-pane fade show active" id="list-home" role="tabpanel" aria-labelledby="list-home-list">
+                      <!-- Карточки со вкладками -->
                       <div class="container">
                         <div class="row">
                             <div class="col-lg-6 col-sm-12">
                                 <div class="product-card" id="order-history-btn">
+                                    <!-- Фотка вкладки с пользователями-->
                                     <div class="product-thumb">
                                         <a><img src="/static/img/admin/users.png"></a>
                                     </div>
+                                    <!-- Название вкладки с пользователями -->
                                     <div class="catalog-title">
                                         <h3>Пользователи</h3>
                                     </div>
@@ -32,9 +36,11 @@
                             </div>
                             <div class="col-lg-6 col-sm-12">
                                 <div class="product-card" id="personal-data-btn">
+                                    <!-- Фотка вкладки с твоарами-->
                                     <div class="product-thumb">
                                         <a><img src="/static/img/admin/items.png"></a>
                                     </div>
+                                    <!-- Название вкладки с пользователями-->
                                     <div class="catalog-title">
                                         <h3>Товары</h3>
                                     </div>
@@ -42,9 +48,11 @@
                             </div>
                             <div class="col-lg-6 col-sm-12">
                                 <div class="product-card" id="suppliers-btn">
+                                    <!-- Фотка вкладки с поставщиками-->
                                     <div class="product-thumb">
                                         <a><img src="/static/img/admin/suppliers.png" alt="Поставщики"></a>
                                     </div>
+                                    <!-- Название вкладки с пользователями-->
                                     <div class="catalog-title">
                                         <h3>Поставщики</h3>
                                     </div>
@@ -55,26 +63,43 @@
                   </div>
                   <div class="tab-pane fade show" id="list-personal-data" role="tabpanel" aria-labelledby="list-personal-data-list">
                         {% if items|length > 0 %}
-                            <h2>Товары</h2>
+                            <!-- Название вкладки + кнопка добавления товара -->
+                            <div class="admin-tab-title">
+                                <h2>Товары</h2><button type="button" class="btn btn-success"><a href="/add_product" style="color: inherit; text-decoration: none;">Добавить</a></button>
+                            </div>
+                            <!-- Табличка с товарами -->
                             <div class="order-table-container">
                                 <table class="table table-bordered" style="">
+                                    <!-- Заголовки таблички -->
                                     <thead class="table-secondary">
                                         <tr>
                                             <th>ID</th>
                                             <th>Название</th>
                                             <th>Цена</th>
                                             <th>Удалить товар</th>
+                                            <th>Редактировать товар</th>
                                         </tr>
                                     </thead>
+                                    <!-- Контент -->
                                     <tbody>
                                         {% for item in items %}
                                             <tr>
+                                                <!-- Id -->
                                                 <th scope="row">{{ item['id'] }}</th>
+                                                <!-- Название товара -->
                                                 <td>{{ item['name'] }}</td>
+                                                <!-- Цена товара -->
                                                 <td>{{ item['price'] }}</td>
+                                                <!-- Кнопка удаления товара -->
                                                 <td>
                                                     <button type="button" class="btn btn-danger">
                                                         <a href="#" class="delete-item-btn" data-item-id="{{ item['id'] }}" style="color: inherit; text-decoration: none;">Удалить</a>
+                                                    </button>
+                                                </td>
+                                                <!-- Кнопка редактирования товара -->
+                                                <td>
+                                                    <button type="button" class="btn btn-warning">
+                                                        <a href="/update_product/{{ item['id'] }}" style="color: inherit; text-decoration: none;">Редактировать</a>
                                                     </button>
                                                 </td>
                                             </tr>
@@ -83,14 +108,17 @@
                                 </table>
                             </div>
                         {% else %}
+                            <!-- Если нет ни одного товара -->
                             <h2>Товары не найдены</h2>
                         {% endif %}
                   </div>
                   <div class="tab-pane fade show" id="list-order-history" role="tabpanel" aria-labelledby="list-order-history-list">
                         {% if users|length > 0 %}
+                            <!-- Название вкладки -->
                             <h2>Пользователи</h2>
                             <div class="order-table-container">
                                 <table class="table table-bordered" style="">
+                                    <!-- Заголовки таблички -->
                                     <thead class="table-secondary">
                                         <tr>
                                             <th>ID</th>
@@ -99,12 +127,17 @@
                                             <th>Удалить пользователя</th>
                                         </tr>
                                     </thead>
+                                    <!-- Контент -->
                                     <tbody>
                                         {% for user in users %}
                                             <tr>
+                                                <!-- Id товара -->
                                                 <th scope="row">{{ user['id'] }}</th>
+                                                <!-- Название товара -->
                                                 <td>{{ user['name'] }} {{ user['surname'] }}</td>
+                                                <!-- Номер мобильного телефона -->
                                                 <td>{{ user['mobile_phone'] }}</td>
+                                                <!-- Кнопка удаления -->
                                                 <td>
                                                     <button type="button" class="btn btn-danger">
                                                         <a href="#" class="delete-user-btn" data-user-id="{{ user['id'] }}" style="color: inherit; text-decoration: none;">Удалить</a>
@@ -117,47 +150,66 @@
                             </div>
 
                         {% else %}
+                            <!-- Если нет ни одного пользователя в БД -->
                             <h2>Пользователи не найдены</h2>
                         {% endif %}
                   </div>
                   <div class="tab-pane fade" id="list-suppliers" role="tabpanel" aria-labelledby="list-suppliers-list">
                       {% if suppliers|length > 0 %}
-                        <h2>Поставщики</h2>
+                        <!-- Название вкладки + кнопка удаления -->
+                        <div class="admin-tab-title">
+                            <h2>Поставщики</h2><button type="button" class="btn btn-success"><a href="/add_supplier" style="color: inherit; text-decoration: none;">Добавить</a></button>
+                        </div>
                         <div class="order-table-container">
                             <table class="table table-bordered" style="">
+                                <!-- Заголовки таблички -->
                                 <thead class="table-secondary">
                                 <tr>
                                     <th>ID</th>
                                     <th>Наименование</th>
                                     <th>Расчетный счет</th>
                                     <th>Мобильный телефон</th>
+                                    <th>Удалить поставщика</th>
+                                    <th>Редактировать поставщика</th>
                                 </tr>
                                 </thead>
-                            <tbody>
-                                  {% for supplier in suppliers %}
-                                        <tr>
-                                          <th scope="row">{{ supplier['id'] }}</th>
-                                          <td>{{ supplier['name'] }}</td>
-                                          <td>{{ supplier['payment_account'] }}</td>
-                                          <td>{{ supplier['mobile_phone'] }}</td>
-                                          <td>
-                                                <button type="button" class="btn btn-danger">
-                                                  <a href="#" class="delete-supplier-btn" data-supplier-id="{{ supplier['id'] }}" style="color: inherit; text-decoration: none;">Удалить</a>
-                                                </button>
-                                          </td>
-                                        </tr>
-                                  {% endfor %}
-                            </tbody>
-                          </table>
+                                <!-- Контент таблицы -->
+                                <tbody>
+                                      {% for supplier in suppliers %}
+                                            <tr>
+                                                <!-- Id -->
+                                                <th scope="row">{{ supplier['id'] }}</th>
+                                                <!-- Название -->
+                                                <td>{{ supplier['name'] }}</td>
+                                                <!-- Расчетный счет -->
+                                                <td>{{ supplier['payment_account'] }}</td>
+                                                <!-- Номер мобильного телефона -->
+                                                <td>{{ supplier['mobile_phone'] }}</td>
+                                                <!-- Кнопка удаления -->
+                                                <td>
+                                                    <button type="button" class="btn btn-danger">
+                                                      <a href="#" class="delete-supplier-btn" data-supplier-id="{{ supplier['id'] }}" style="color: inherit; text-decoration: none;">Удалить</a>
+                                                    </button>
+                                                </td>
+                                                <!-- Кнопка редактирования -->
+                                                <td>
+                                                    <button type="button" class="btn btn-warning">
+                                                        <a href="/update_supplier/{{ supplier['id'] }}" style="color: inherit; text-decoration: none;">Редактировать</a>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                      {% endfor %}
+                                </tbody>
+                            </table>
                         </div>
                       {% else %}
+                        <!-- Если нет ни одного поставщика -->
                         <h2>Поставщики не найдены</h2>
                       {% endif %}
                     </div>
               </div>
-
-              <script src="/static/js/admin_script.js"></script>
           </div>
         </div>
     </div>
+    <script src="/static/js/admin_script.js"></script>
 {% endblock %}

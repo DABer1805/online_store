@@ -1,50 +1,257 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Добавить товар</h1>
-    <form action="/add_product" method="post" enctype="multipart/form-data">
+    <div class="return-to-catalog" style="padding-top: 20px;">
+        <!-- Стрелочка "обратно" -->
+        <a href="/admin">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-double-left" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M8.354 1.646a.5.5 0 0 1 0 .708L2.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"/>
+                <path fill-rule="evenodd" d="M12.354 1.646a.5.5 0 0 1 0 .708L6.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"/>
+            </svg>
+        </a>
+        <!-- Кнопка "обратно" -->
+        <a href="/admin">Обратно</a>
+    </div>
+    <h1>Товар</h1>
+    <form action="" method="post" enctype="multipart/form-data">
         {{ form.hidden_tag() }}
+        <!-- Картинка (поле ввода) -->
         <p>
-            {{ form.product_image.label }}<br>
+            <span class="req-marker">*</span>{{ form.product_image.label
+            }}<br>
             {{ form.product_image(class="form-control", accept=".png") }}
+            {% for error in form.product_image.errors %}
+                <div class="alert alert-warning" role="alert">
+                    {{ error }}
+                </div>
+            {% endfor %}
         </p>
+        <!-- Название -->
         <p>
-            {{ form.name.label }}<br>
+            <span class="req-marker">*</span>{{ form.name.label }}<br>
             {{ form.name(class="form-control") }}
+            {% for error in form.name.errors %}
+                <div class="alert alert-warning" role="alert">
+                    {{ error }}
+                </div>
+            {% endfor %}
         </p>
+        <!-- Цена -->
         <p>
-            {{ form.cost.label }}<br>
+            <span class="req-marker">*</span>{{ form.cost.label }}<br>
             {{ form.cost(class="form-control") }}
+            {% for error in form.cost.errors %}
+                <div class="alert alert-warning" role="alert">
+                    {{ error }}
+                </div>
+            {% endfor %}
             {% if cost_error %}
-                <div class="alert alert-danger" role="alert">
+                <div class="alert alert-warning" role="alert">
                     Некорректный формат цены. Нужно ввести вещественное\целое число
                 </div>
             {% endif %}
         </p>
+        <!-- Скидка -->
         <p>
-            {{ form.discount.label }}<br>
+            <span class="req-marker">*</span>{{ form.discount.label }}<br>
             {{ form.discount(class="form-control") }}
+            {% for error in form.discount.errors %}
+                <div class="alert alert-warning" role="alert">
+                    {{ error }}
+                </div>
+            {% endfor %}
         </p>
+        <!-- Категория -->
         <p>
-            {{ form.category.label }}<br>
+            <span class="req-marker">*</span>{{ form.category.label }}<br>
             {{ form.category(class="form-select") }}
+            {% for error in form.category.errors %}
+                <div class="alert alert-warning" role="alert">
+                    {{ error }}
+                </div>
+            {% endfor %}
         </p>
+        <!-- Поставщик -->
+        <p>
+            <span class="req-marker">*</span>{{ form.supplier.label }}<br>
+            {{ form.supplier(class="form-select") }}
+            {% for error in form.supplier.errors %}
+                <div class="alert alert-warning" role="alert">
+                    {{ error }}
+                </div>
+            {% endfor %}
+        </p>
+        <!-- Бренд -->
+        <p>
+            {{ form.brand.label }}<br>
+            {{ form.brand(class="form-control") }}
+            {% for error in form.brand.errors %}
+                <div class="alert alert-warning" role="alert">
+                    {{ error }}
+                </div>
+            {% endfor %}
+        </p>
+        <!-- Тип продукта -->
+        <p>
+            {{ form.type.label }}<br>
+            {{ form.type(class="form-control") }}
+            {% for error in form.type.errors %}
+                <div class="alert alert-warning" role="alert">
+                    {{ error }}
+                </div>
+            {% endfor %}
+        </p>
+        <!-- Тип упаковки -->
+        <p>
+            {{ form.type_of_packing.label }}<br>
+            {{ form.type_of_packing(class="form-control") }}
+            {% for error in form.type_of_packing.errors %}
+                <div class="alert alert-warning" role="alert">
+                    {{ error }}
+                </div>
+            {% endfor %}
+        </p>
+        <!-- Ширина -->
+        <p>
+            {{ form.width.label }}<br>
+            {{ form.width(class="form-control") }}
+            {% for error in form.width.errors %}
+                <div class="alert alert-warning" role="alert">
+                    {{ error }}
+                </div>
+            {% endfor %}
+        </p>
+        <!-- Высота -->
+        <p>
+            {{ form.height.label }}<br>
+            {{ form.height(class="form-control") }}
+            {% for error in form.height.errors %}
+                <div class="alert alert-warning" role="alert">
+                    {{ error }}
+                </div>
+            {% endfor %}
+        </p>
+        <!-- Глубина -->
+        <p>
+            {{ form.depth.label }}<br>
+            {{ form.depth(class="form-control") }}
+            {% for error in form.depth.errors %}
+                <div class="alert alert-warning" role="alert">
+                    {{ error }}
+                </div>
+            {% endfor %}
+        </p>
+        <!-- Вес -->
+        <p>
+            {{ form.weight.label }}<br>
+            {{ form.weight(class="form-control") }}
+            {% for error in form.weight.errors %}
+                <div class="alert alert-warning" role="alert">
+                    {{ error }}
+                </div>
+            {% endfor %}
+        </p>
+        <!-- Ёмкость -->
+        <p>
+            {{ form.capacity.label }}<br>
+            {{ form.capacity(class="form-control") }}
+            {% for error in form.capacity.errors %}
+                <div class="alert alert-warning" role="alert">
+                    {{ error }}
+                </div>
+            {% endfor %}
+        </p>
+        <!-- Минимальная температура хранения -->
         <p>
             {{ form.min_temp.label }}<br>
             {{ form.min_temp(class="form-control") }}
+            {% for error in form.min_temp.errors %}
+                <div class="alert alert-warning" role="alert">
+                    {{ error }}
+                </div>
+            {% endfor %}
         </p>
+        <!-- Максимальная температура хранения -->
         <p>
             {{ form.max_temp.label }}<br>
             {{ form.max_temp(class="form-control") }}
+            {% for error in form.max_temp.errors %}
+                <div class="alert alert-warning" role="alert">
+                    {{ error }}
+                </div>
+            {% endfor %}
         </p>
+        <!-- Срок годности -->
         <p>
             {{ form.expiration_date.label }}<br>
             {{ form.expiration_date(class="form-control") }}
+            {% for error in form.expiration_date.errors %}
+                <div class="alert alert-warning" role="alert">
+                    {{ error }}
+                </div>
+            {% endfor %}
         </p>
+        <!-- Калории -->
+        <p>
+            {{ form.calories.label }}<br>
+            {{ form.calories(class="form-control") }}
+            {% for error in form.calories.errors %}
+                <div class="alert alert-warning" role="alert">
+                    {{ error }}
+                </div>
+            {% endfor %}
+        </p>
+        <!-- Белки -->
+        <p>
+            {{ form.squirrels.label }}<br>
+            {{ form.squirrels(class="form-control") }}
+            {% for error in form.squirrels.errors %}
+                <div class="alert alert-warning" role="alert">
+                    {{ error }}
+                </div>
+            {% endfor %}
+        </p>
+        <!-- Жиры -->
+        <p>
+            {{ form.fats.label }}<br>
+            {{ form.fats(class="form-control") }}
+            {% for error in form.fats.errors %}
+                <div class="alert alert-warning" role="alert">
+                    {{ error }}
+                </div>
+            {% endfor %}
+        </p>
+        <!-- Углеводы -->
+        <p>
+            {{ form.carbohydrates.label }}<br>
+            {{ form.carbohydrates(class="form-control") }}
+            {% for error in form.carbohydrates.errors %}
+                <div class="alert alert-warning" role="alert">
+                    {{ error }}
+                </div>
+            {% endfor %}
+        </p>
+        <!-- Описание -->
         <p>
             {{ form.extra_information.label }}<br>
             {{ form.extra_information(class="form-control") }}
+            {% for error in form.extra_information.errors %}
+                <div class="alert alert-warning" role="alert">
+                    {{ error }}
+                </div>
+            {% endfor %}
         </p>
+        <!-- Состав -->
+        <p>
+            {{ form.composition.label }}<br>
+            {{ form.composition(class="form-control") }}
+            {% for error in form.composition.errors %}
+                <div class="alert alert-warning" role="alert">
+                    {{ error }}
+                </div>
+            {% endfor %}
+        </p>
+        <!-- Кнопка отправки формы -->
         <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
         {% if message|length > 0 %}
             <div class="alert alert-warning" role="alert">{{ message }}</div>

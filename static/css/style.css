@@ -17,33 +17,40 @@
   border: 0;
 }
 
+/* Для заголовков 4-го уровня */
 h4 {
     color: #c2c2c2;
 }
 
+/* Панель навигации */
 .navbar-light .navbar-nav .nav-link {
 	color: #111;
 	font-weight: 500;
 	text-transform: uppercase;
 }
 
+/* Каруселька */
 .my-carousel {
 	padding: 0;
 }
 
+/* Элемент карусельки */
 .my-carousel .carousel-item {
 	display: flex;
 }
 
+/* Фотка на элементе карусельки */
 .my-carousel .carousel-item img {
 	object-fit: cover;
 }
 
+/* Выпадающее менб на навигационной панели */
 .navbar-nav .dropdown-menu {
 	right: 0;
 	left: auto;
 }
 
+/* Для таблички с корзиной */
 .top-menu li a::after {
 	content: '';
 	display: block;
@@ -58,19 +65,23 @@ h4 {
 	transform: scale(1);
 }
 
+/* Фотка в корзине */
 .modal-body img {
-	max-width: 100px;
+	max-width: 50px;
 }
 
+/* Карточка */
 .product-card {
 	box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.06);
 	transition: all .3s;
 }
 
+/* Карточка с наведением */
 .product-card:hover {
 	box-shadow: 0 14px 30px -15px rgba(0, 0, 0, 0.75);
 }
 
+/* Верхняя часть карточки - название */
 .product-thumb a {
 	display: flex;
 	align-items: center;
@@ -79,21 +90,26 @@ h4 {
 	padding: 20px;
 }
 
+/* Верхняя часть карточки - фотка */
 .product-thumb img {
 	max-width: 100%;
 	max-height: 100%;
 	margin-bottom: 20px;
 }
 
+/* Нижняя часть карточки - инфа */
 .product-details {
 	padding: 20px;
 }
 
+/* Нижняя часть карточки - заголовок */
 .catalog-title {
     padding: 20px;
     font-color: #111;
 }
 
+/* Нижняя часть карточки - заголовок 4-го уровня +
+кнопка добавления в корзину */
 .product-details h4 a {
 	font-weight: 500;
 	display: block;
@@ -102,6 +118,7 @@ h4 {
 	text-decoration: none;
 }
 
+/* Нижняя часть карточки - параграф */
 .product-details p {
 	font-size: 15px;
 	margin-bottom: 20px;
@@ -116,12 +133,14 @@ h4 {
 	padding-top: 20px;
 }
 
+/* Нижняя часть карточки - итоговая цена */
 .product-price {
 	font-size: 18px;
 	color: #ee6e73;
 	font-weight: 600;
 }
 
+/* Нижняя часть карточки - цена без скидки */
 .product-price small {
 	color: #ccc;
 	font-weight: 400;
@@ -129,42 +148,48 @@ h4 {
 	margin-right: 5px;
 }
 
+/* Ссылка-иконка */
 .product-links a {
 	font-size: 20px;
 	margin-left: 10px;
 }
 
+/* Изображение в корзине */
 .basket_img {
     max-width: 50px;
     max-height: 80px;
 }
 
+/* Кнопка повышения количества товара в корзине */
 .add_amount_btn {
     font-size: 15px;
 	color: #999;
 	height: 44px;
 }
 
+/* Кнопка уменьшения количества товара в корзине */
 .del_amount_btn {
     font-size: 15px;
 	color: #999;
 	height: 44px;
 }
 
+/* Кнопка фильтрации */
 #item_filter_button {
     margin-top: 20px;
 }
 
+/* Запрет на выделение текста */
 .noselect {
   -webkit-touch-callout: none; /* iOS Safari */
   -webkit-user-select: none; /* Safari */
   -khtml-user-select: none; /* Konqueror HTML */
   -moz-user-select: none; /* Old versions of Firefox */
   -ms-user-select: none; /* Internet Explorer/Edge */
-  user-select: none; /* Non-prefixed version, currently
-                        supported by Chrome, Edge, Opera and Firefox */
+  user-select: none; /* Chrome, Edge, Opera and Firefox */
 }
 
+/* Настраиваем элементы карусели */
 .carousel-control-prev-icon,
 .carousel-control-next-icon {
   height: 50px;
@@ -190,6 +215,7 @@ h4 {
   color: black;
 }
 
+/* Фотка товара */
 .item_img {
     position: relative;
     max-width: 70%;
@@ -199,11 +225,12 @@ h4 {
     transform: translate(-50%);
 }
 
-
+/* Название товара */
 .item_title {
     padding-top: 20px;
 }
 
+/* Цена товара */
 .product-price-item {
     margin-top: 20px;
     padding: 20px;
@@ -212,6 +239,7 @@ h4 {
 	font-weight: 600;
 }
 
+/* Цена товара до скидки */
 .product-price-item small {
     color: #ccc;
 	font-weight: 400;
@@ -219,10 +247,12 @@ h4 {
 	margin-right: 5px;
 }
 
+/* Кнопка возврата в каталог */
 .return-to-catalog {
 	height: 60px;
 }
 
+/* Текст возврата в каталог */
 .return-to-catalog a {
     color: black;
     font-size: 18px;
@@ -230,35 +260,43 @@ h4 {
 	text-decoration: none;
 }
 
+/* Иконка возврата в каталог */
 .return-to-catalog svg {
     width: 22px;
     height: 22px;
 }
 
+/* Контейнер с бредкрамбом */
 .breadcrumb-container {
     padding-top: 20px;
 }
 
+/* Контейнер с бредкрамбом */
 .breadcrumb-container a {
     text-decoration: none;
 }
 
+/* Элемент бредкрамба - ссылка */
 .breadcrumb-item a {
     color: #a1a1a1;
 }
 
+/* Элемент бредкрамба - последний */
 .breadcrumb-item active a {
     color: #d2d2d2;
 }
 
+/* Группа вкладок */
 .item-tabs {
     padding-top: 60px;
 }
 
+/* Контент группы вкладок */
 .item-tab-content {
     padding: 20px;
 }
 
+/* Табличка пищевой ценности */
 .nutritional-value-table {
     display: -webkit-box;
     display: -ms-flexbox;
@@ -273,6 +311,7 @@ h4 {
     margin-top: 16px;
 }
 
+/* Элемент таблички пищевой ценности */
 .nutritional-value-table-item {
     -webkit-box-orient: vertical;
     -webkit-box-direction: normal;
@@ -286,12 +325,19 @@ h4 {
     text-align: center;
 }
 
+/* Цифры в табличке пищевой ценности */
 .nutritional-value-table-count {
     font-size: 20px;
 	color: #000000;
 	font-weight: 600;
 }
 
+/* Заголовок группы вкладок на админке */
+.admin-tab-title {
+    margin-bottom: 15px;
+}
+
+/* Точечки после названия характеристики */
 .feature-title:after {
     margin: 0 0 4px 8px;
     content: '';
@@ -301,6 +347,7 @@ h4 {
     border-bottom: 1px dotted #e7e7e7;
 }
 
+/* Название характеристики */
 .feature-title {
     display: -webkit-box;
     display: -ms-flexbox;
@@ -311,6 +358,7 @@ h4 {
     overflow: hidden;
 }
 
+/* Ячейка таблицы характеристик */
 .feature-table-cell {
     display: grid;
     grid-template-columns: 60% 60%;
@@ -322,6 +370,7 @@ h4 {
     align-items: start;
 }
 
+/* Таблица характеристик */
 .features-table {
     display: -webkit-box;
     display: -ms-flexbox;
@@ -335,24 +384,24 @@ h4 {
     word-break: keep-all;
 }
 
+/* Фон при выделении мышкой */
 .item-img-container {
     height: fit-content;
 }
 
+/* Фон при выделении мышкой */
 ::selection {
     background-color: #82dd47;
     color: #fff;
 }
 
+/* Заголовок страницы личного кабинета */
 .personal_account_title {
     margin-top: 20px;
     margin-bottom: 20px;
 }
 
-.order-table-container {
-    padding: 10px;
-}
-
+/* Заголовок инфы о пользователе */
 .user-info-title {
     padding-left: 20px;
     font-size: 25px;
@@ -360,12 +409,19 @@ h4 {
     color: #6c757d;
 }
 
+/* Инфа о пользователе */
 .user-info-data {
     font-size: 18px;
     font-weight: 300;
     color: #a1a1a1;
 }
 
+/* Кнопка выхода */
 .exit-btn {
     margin-top: 20px;
+}
+
+/* Метка обязательных полей */
+.req-marker {
+    color: red;
 }
