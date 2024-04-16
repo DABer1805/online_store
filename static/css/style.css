@@ -65,6 +65,11 @@ h4 {
 	transform: scale(1);
 }
 
+/* Размер шрифта в корзине */
+.modal-body {
+    font-size: 14px;
+}
+
 /* Фотка в корзине */
 .modal-body img {
 	max-width: 50px;
