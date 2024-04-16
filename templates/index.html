@@ -40,14 +40,14 @@
 			<!-- Кнопка "<" -->
 			<button class="carousel-control-prev" type="button"
 					data-bs-target="#carouselExampleIndicators"
-					data-bs-slide="prev" style="margin-right:50px;">
+					data-bs-slide="prev">
 				<span class="carousel-control-prev-icon" aria-hidden="true"></span>
 				<span class="visually-hidden">Previous</span>
 			</button>
 			<!-- Кнопка ">" -->
 			<button class="carousel-control-next" type="button"
 					data-bs-target="#carouselExampleIndicators"
-					data-bs-slide="next" style="margin-left:50px;">
+					data-bs-slide="next">
 				<span class="carousel-control-next-icon" aria-hidden="true"></span>
 				<span class="visually-hidden">Next</span>
 			</button>
@@ -114,7 +114,7 @@
 														{{ new_price|round(2) }}₽ <small>{{ item['price'] }}₽</small>
 													{% endif %}
 												</div>
-												<div class="product-links">
+												<div class="product-links" style="margin-right: 50%">
 													{% if current_user.is_authenticated %}
 														<!-- Если пользователь авторизован, то кнопка добавляет товар в корзину -->
 														<a class="add_item_button" id="item{{ item['id'] }}"><i class="fas fa-shopping-cart"></i></a>
