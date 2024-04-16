@@ -126,7 +126,7 @@
 Запуск сервера осуществляется с помощью файла main.py
 
 ```shell
-python main.py
+python server.py
 ```
 
 ---
