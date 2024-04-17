@@ -14,6 +14,7 @@ class OrdersResource(Resource):
         session = db_session.create_session()
         # Получаем заказ
         order = session.query(Order).get(order_id)
+        session.close()
         # Возвращаем инфу о заказе
         return jsonify(
             {'order': order.to_dict(
@@ -38,6 +39,7 @@ class OrdersResource(Resource):
         session.delete(order)
         # Коммитим
         session.commit()
+        session.close()
         # Возвращаем код успешной отправки
         return jsonify({'success': 'OK'})
 
@@ -55,6 +57,7 @@ class OrdersListResource(Resource):
         else:
             # Иначе, получаем все заказы
             orders = session.query(Order).all()
+        session.close()
         # Возвращаем инфу о заказах
         return jsonify({
             'orders': [
@@ -80,6 +83,7 @@ class OrdersListResource(Resource):
         session.add(order)
         # Коммитим
         session.commit()
+        session.close()
         # Возвращаем успешный код отправки
         return jsonify({'id': order.id})
 
@@ -90,6 +94,7 @@ def abort_if_order_not_found(order_id):
     session = db_session.create_session()
     # Получаем заказ по id
     order = session.query(Order).get(order_id)
+    session.close()
     # Если не нашелся
     if not order:
         # Кидаем ошибку

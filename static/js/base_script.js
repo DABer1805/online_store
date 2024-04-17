@@ -115,6 +115,17 @@ function addItemToBasket(itemId) {
                 `${(Math.round(itemPrice * itemAmount * 100) / 100)}₽`
             );
         }
+
+        // Ячейка с итоговой ценой заказа
+        totalCell = document.getElementById('total-cell');
+
+        // Получаем эту цену
+        total = parseFloat(totalCell.innerHTML.slice(7, -1));
+        // Прибавляем туда цену товара
+        total = (Math.round((total + itemPrice) * 100) / 100);
+
+        // И перезаписываем итоговую цену
+        totalCell.innerHTML = `Итого: ${total}₽`;
     });
 }
 
@@ -128,12 +139,12 @@ function delItemInBasket(itemId) {
     ).then((result) => {
         // Название товара
         var itemName = result['item']['name'];
+        // Цена за 1 товар
+        var itemPrice = result['item']['price'] * (
+            1 - result['item']['discount'] * 0.01
+        );
         // Если количество товара > 0
         if (result['amount']) {
-            // Цена за 1 товар
-            var itemPrice = result['item']['price'] * (
-                1 - result['item']['discount'] * 0.01
-            );
             // Количество товара
             var itemAmount = result['amount'];
 
@@ -156,6 +167,17 @@ function delItemInBasket(itemId) {
             // Удаляем строку таблицы с данным товаром
             document.getElementById(`item${itemId}_cell`).remove();
         }
+        // Ячейка с итоговой ценой заказа
+        totalCell = document.getElementById('total-cell');
+
+        // Получаем эту цену
+        total = parseFloat(totalCell.innerHTML.slice(7, -1));
+        // Отнимаем там цену товара
+        total = (Math.round((total - itemPrice) * 100) / 100);
+
+        // И перезаписываем итоговую цену
+        totalCell.innerHTML = `Итого: ${total}₽`;
+
         // Обращаемся к контейнеру для сообщений
         var messageContainer = document.getElementById(
             "message_container"
@@ -220,6 +242,11 @@ $('#make_order_btn').on('click', function() {
             id="add_item_message"  colspan="5">Корзина пуста!!!
             </td></tr>`;
         }
+        // Ячейка с итоговой ценой заказа
+        totalCell = document.getElementById('total-cell');
+        // И перезаписываем итоговую цену
+        totalCell.innerHTML = 'Итого: 0₽';
+
         basketTable = document.getElementById('basket_table');
         basketTable.innerHTML = messageDiv;
     })

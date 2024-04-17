@@ -45,6 +45,8 @@ def add_item_to_basket(item_id, user_id):
     # Получаем данный товар
     item = session.query(Item).get(item_id)
 
+    session.close()
+
     # Возвращам инфу о товаре после добавления
     return jsonify(
         {

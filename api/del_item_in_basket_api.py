@@ -44,6 +44,8 @@ def del_item_in_basket(item_id, user_id):
             # Количество данного товара
             amount = new_items_list.get(item_id)
 
+            session.close()
+
             # Возвращам инфу о товаре после удаления
             return jsonify(
                 {

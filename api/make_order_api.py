@@ -29,6 +29,7 @@ def make_order(user_id):
         user.items_list = None
         # Коммитим
         session.commit()
+        session.close()
 
         return jsonify({'status': 'OK'})
     return jsonify({'status': 'FAIL'})

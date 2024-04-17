@@ -99,9 +99,18 @@ button.addEventListener('click', function(e) {
                 method: 'DELETE',
               }).then(response => {
                 if (response.ok) {
-                  // Если все хорошо
-                  alert('Поставщик удален');
-                  window.location.reload();
+                  response.json().then( function f(result) {
+                        if (result['success']) {
+                          // Если все хорошо и поставщик удалился
+                          alert('Поставщик удален');
+                          window.location.reload();
+                        } else {
+                            // Если все хорошо, но при этом поставщик
+                            // связан с какими то товарами
+                            alert(result['error']);
+                        }
+                    }
+                  );
                 } else {
                   // Что-то поломалось
                   response.json().then(data => {

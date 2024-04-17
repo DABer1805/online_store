@@ -83,6 +83,7 @@
 + ***static***
     + ***css*** - все css файлики
       + ***style.css*** - файл со стилями 
+      + ***normalize.css*** - файл с нормализацией (взято отсюда: [github.com/necolas/normalize.css]())
     + ***img*** - все картинки
       + ***admin***
         + ***items.png*** - вкладка с товарами

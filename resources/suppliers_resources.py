@@ -2,6 +2,7 @@ from flask import jsonify
 from flask_restful import Resource, reqparse, abort
 
 from data import db_session
+from data.items import Item
 from data.suppliers import Supplier
 
 
@@ -33,13 +34,20 @@ class SupplierResource(Resource):
         session = db_session.create_session()
         # Поставщик
         supplier = session.query(Supplier).get(supplier_id)
-        # Удаляем поставщика
-        session.delete(supplier)
-        # Коммитим
-        session.commit()
-        # Возвращаем код успешной отправки
-        return jsonify({'success': 'OK'})
 
+        related_items = [item.id for item in session.query(Item).filter(
+            Item.supplier == supplier.id
+        ).all()]
+
+        if not related_items:
+            # Удаляем поставщика
+            session.delete(supplier)
+            # Коммитим
+            session.commit()
+            # Возвращаем код успешной отправки
+            return jsonify({'success': 'OK'})
+        return jsonify({'error': f'Товары с ID {related_items} связаны с '
+                                 f'этим поставщиком!!!'})
 
 class SupplierListResource(Resource):
     def get(self):
@@ -48,6 +56,7 @@ class SupplierListResource(Resource):
         session = db_session.create_session()
         # Поставщики
         suppliers = session.query(Supplier).all()
+        session.close()
         # Возвращаем инфу о поставщиках
         return jsonify({
             'suppliers': [
@@ -76,6 +85,7 @@ class SupplierListResource(Resource):
         session.add(supplier)
         # Коммитим
         session.commit()
+        session.close()
         # Возвращаем код успешной отправки
         return jsonify({'id': supplier.id})
 
@@ -86,6 +96,7 @@ def abort_if_supplier_not_found(supplier_id):
     session = db_session.create_session()
     # Поставщик
     supplier = session.query(Supplier).get(supplier_id)
+    session.close()
     # Если поставщик не нашелся
     if not supplier:
         # Кидаем ошибку

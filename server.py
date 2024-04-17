@@ -1,5 +1,6 @@
 import os
 
+from PIL import Image
 from flask import Flask, render_template, redirect, request, url_for, abort
 from flask_cors import CORS, cross_origin
 from flask_restful import Api
@@ -109,6 +110,7 @@ def login():
         user = db_sess.query(User).filter(
             User.mobile_phone == form.mobile_phone.data
         ).first()
+        db_sess.close()
         # Если пароль совпал и пользователь нашелся
         if user and user.check_password(form.password.data):
             # Авторизизуем пользователя
@@ -150,12 +152,14 @@ def reqister():
         if db_sess.query(User).filter(
                 User.mobile_phone == form.mobile_phone.data
         ).first():
+            db_sess.close()
             # Открываем страничку с формой и выводим уведомление о
             # некорректности данных
             return render_template(
                 'register.html', title='Регистрация', host_data=request.host,
                 form=form, message="Такой пользователь уже есть"
             )
+        db_sess.close()
         # Добавляем в БД нового пользователя
         post(
             f'http://{request.host}/api/users',
@@ -193,6 +197,7 @@ def change_user_data():
         db_sess = db_session.create_session()
         # Достаём нашего пользователя из БД
         user = db_sess.query(User).filter(User.id == current_user.id).first()
+        db_sess.close()
         # Если нашелся
         if user:
             # Заполяняем поле с номером телефона
@@ -226,6 +231,7 @@ def change_user_data():
             if db_sess.query(User).filter(
                     User.mobile_phone == form.mobile_phone.data
             ).count() > 1:
+                db_sess.close()
                 # Открываем страничку с формой и выводим уведомление о
                 # некорректности данных
                 return render_template(
@@ -302,10 +308,12 @@ def catalog():
         items_list = ''
     # Получаем список товаров, которые лежат в корзине пользователя,
     # включая количество товаров
-    user_basket = get(
+    user_basket_info = get(
         f'http://{request.host}/api/user_basket',
         params={'items_list': items_list}
-    ).json()['items']
+    ).json()
+    user_basket = user_basket_info['items']
+    total = user_basket_info['total']
     # Получаем список всех товаров с учетом параметров
     items = get(
         f'http://{request.host}/api/items', params=params
@@ -319,7 +327,7 @@ def catalog():
         "items_list.html", title='Продуктовый рай', host_data=request.host,
         cur_price=cur_price, checked_buttons=checked_buttons, items=items,
         categories=categories, cat_filters=cat_filters,
-        max_price=MAX_PRICE, user_basket=user_basket
+        max_price=MAX_PRICE, user_basket=user_basket, total=total
     )
 
 
@@ -354,14 +362,18 @@ def item_page(item_id):
         items_list = ''
     # Получаем список товаров, которые лежат в корзине пользователя,
     # включая количество товаров
-    user_basket = get(
+    # Получаем список товаров, которые лежат в корзине пользователя,
+    # включая количество товаров
+    user_basket_info = get(
         f'http://{request.host}/api/user_basket',
         params={'items_list': items_list}
-    ).json()['items']
+    ).json()
+    user_basket = user_basket_info['items']
+    total = user_basket_info['total']
     return render_template(
         "item_page.html", title='Продуктовый рай', host_data=request.host,
         item=item, categories=categories, max_price=max_price,
-        from_catalog=from_catalog, user_basket=user_basket
+        from_catalog=from_catalog, user_basket=user_basket, total=total
     )
 
 
@@ -379,14 +391,17 @@ def home_page():
         items_list = ''
     # Получаем список товаров, которые лежат в корзине пользователя,
     # включая количество товаров
-    user_basket = get(
+    user_basket_info = get(
         f'http://{request.host}/api/user_basket',
         params={'items_list': items_list}
-    ).json()['items']
+    ).json()
+    user_basket = user_basket_info['items']
+    total = user_basket_info['total']
     return render_template(
         "index.html", title='Продуктовый рай', host_data=request.host,
         slides=slides, categories=CATEGORIES,
-        discounted_items=discounted_items, user_basket=user_basket
+        discounted_items=discounted_items, user_basket=user_basket,
+        total=total
     )
 
 
@@ -427,10 +442,12 @@ def personal_account():
             items_list = ''
         # Получаем список товаров, которые лежат в корзине пользователя,
         # включая количество товаров
-        user_basket = get(
+        user_basket_info = get(
             f'http://{request.host}/api/user_basket',
             params={'items_list': items_list}
-        ).json()['items']
+        ).json()
+        user_basket = user_basket_info['items']
+        total = user_basket_info['total']
 
         # Открываем страничку личного кабинета
         return render_template(
@@ -438,7 +455,7 @@ def personal_account():
             host_data=request.host, orders=orders,
             from_catalog=from_catalog, item_id=item_id,
             cat_filters=cat_filters, cat_ids=cat_ids, item_name=item_name,
-            max_price=max_price, user_basket=user_basket
+            max_price=max_price, user_basket=user_basket, total=total
         )
 
     # Если пользователь не авторизован, то кидаем ошибку
@@ -449,8 +466,19 @@ def personal_account():
 def add_product_page():
     """Страничка добавления товара"""
 
+    session = db_session.create_session()
+    suppliers_names = [
+        supplier.name for supplier in session.query(Supplier).all()
+    ]
+    categories_names = [
+        category.name for category in session.query(Category).all()
+    ]
+    session.close()
+
     # создание формы добавления товаров
     form = AddProductForm()
+    form.supplier.choices = suppliers_names
+    form.category.choices = categories_names
 
     # Проверка id пользователя (доступ только для id == 1)
     if current_user.id == 1:
@@ -459,8 +487,10 @@ def add_product_page():
             session = db_session.create_session()
             # Есть ли наше изображение в переданном запросе
             if 'product_image' in request.files:
-                # Имя файла с изображением
+                # Загруженное изображение
                 image = request.files['product_image']
+                if not image.filename:
+                    image = Image.open("static/img/default_item_image.png")
                 # Проверка формата файла:
                 if image.filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS:
                     # Определяем имя файла на основе id последнего товара в бд
@@ -472,6 +502,7 @@ def add_product_page():
                                                 filename)
                     image.save(path_to_save)
                 else:
+                    session.close()
                     return render_template(
                         'add_product.html', title="Страница управления",
                         form=form, message="Недопустимый формат изображения"
@@ -517,6 +548,7 @@ def add_product_page():
                     "composition": form.composition.data,
                 }
             )
+            session.close()
             return redirect('/admin')
 
         return render_template(
@@ -530,13 +562,27 @@ def add_product_page():
 @app.route("/update_product/<int:item_id>", methods=['GET', 'POST'])
 def update_product_page(item_id):
     """ Редактирование данных о товаре """
+    session = db_session.create_session()
+    suppliers_names = [
+        supplier.name for supplier in session.query(Supplier).all()
+    ]
+    categories_names = [
+        category.name for category in session.query(Category).all()
+    ]
+    session.close()
+
+    # создание формы добавления товаров
     form = AddProductForm()
+    form.supplier.choices = suppliers_names
+    form.category.choices = categories_names
+
     # Подгрузка текущей инфы в поля формочки
     if request.method == "GET":
         # Сессия подключения к БД
-        db_sess = db_session.create_session()
+        session = db_session.create_session()
         # Достаём товар из БД
-        item = db_sess.query(Item).filter(Item.id == item_id).first()
+        item = session.query(Item).filter(Item.id == item_id).first()
+        session.close()
         # Если нашелся
         if item:
             # Заполяняем поле с названием товара
@@ -546,9 +592,13 @@ def update_product_page(item_id):
             # Заполняем поле со скидкой
             form.discount.data = item.discount
             # Заполняем поле с категориями
-            form.category.data = item.category
+            form.category.data = session.query(Category).filter(
+                Category.id == item.category
+            ).first().name
             # Заполняем поле с поставщиком
-            form.supplier.data = item.supplier
+            form.supplier.data = session.query(Supplier).filter(
+                Supplier.id == item.supplier
+            ).first().name
             # Заполняем поле с брендом
             form.brand.data = item.brand
             # Заполняем поле с типом товара
@@ -594,16 +644,28 @@ def update_product_page(item_id):
         item = session.query(Item).filter(Item.id == item_id).first()
         # Если нашелся
         if item:
-            # Имя файла с изображением
-            image = request.files['product_image']
-            # Проверка формата файла:
-            if image.filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS:
-                filename = f"item{item.id}.png"
-                # Здесь указывается путь до папки на сервере,
-                # где будет сохранен файл
-                path_to_save = os.path.join('./static/img/items',
-                                            filename)
-                image.save(path_to_save)
+            # Есть ли наше изображение в переданном запросе
+            if 'product_image' in request.files:
+                # Загруженное изображение
+                image = request.files['product_image']
+                if image.filename:
+                    # Проверка формата файла:
+                    if image.filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS:
+                        # Определяем имя файла на основе id последнего
+                        # товара в бд
+                        id_amount = len(session.query(Item.id).all())
+                        filename = f"item{id_amount + 1}.png"
+                        # Здесь указывается путь до папки на сервере,
+                        # где будет сохранен файл
+                        path_to_save = os.path.join('./static/img/items',
+                                                    filename)
+                        image.save(path_to_save)
+                    else:
+                        return render_template(
+                            'add_product.html', title="Страница управления",
+                            form=form,
+                            message="Недопустимый формат изображения"
+                        )
             # Переписываем поле с названием товара
             item.name = form.name.data
             # Переписываем поле с ценой
@@ -616,7 +678,7 @@ def update_product_page(item_id):
             # Переписываем поле с поставщиком
             item.supplier = session.query(Supplier).filter(
                 Supplier.name == form.supplier.data
-            ).first().id,
+            ).first().id
             # Переписываем поле с категориями
             item.category = session.query(Category).filter(
                 Category.name == form.category.data
@@ -640,16 +702,16 @@ def update_product_page(item_id):
             # Переписываем поле с минимальной температурой
             item.min_temp = (
                 form.min_temp.data if form.min_temp.data else '0'
-            ),
+            )
             # Переписываем поле с максимальной температурой
             item.max_temp = (
                 form.max_temp.data if form.max_temp.data else '0'
-            ),
+            )
             # Переписываем поле со сроком годности
             item.expiration_date = (
                 f"{form.expiration_date.data} дней"
                 if form.expiration_date.data else 'Не ограничен'
-            ),
+            )
             # Переписываем поле с калориями
             item.calories = form.calories.data
             # Переписываем поле с белками
@@ -686,6 +748,20 @@ def add_supplier_page():
     if int(current_user.get_id()) == 1:
         # Если нажата кнопка отправки формы
         if form.validate_on_submit():
+            # Сессия подключения к БД
+            session = db_session.create_session()
+            if session.query(Supplier).filter(
+                    Supplier.mobile_phone == form.mobile_phone.data
+            ).first() or session.query(Supplier).filter(
+                Supplier.email == form.email.data
+            ).first():
+                # Открываем страничку с формой и выводим уведомление о
+                # некорректности данных
+                return render_template(
+                    'add_supplier.html', title="Регистрация поставщика",
+                    host_data=request.host, form=form,
+                    message="Такой поставщик уже есть"
+                )
             # регистрируем поставщика
             post(
                 f'http://{request.host}/api/suppliers',
@@ -719,6 +795,7 @@ def update_supplier_page(supplier_id):
         supplier = db_sess.query(Supplier).filter(
             Supplier.id == supplier_id
         ).first()
+        db_sess.close()
         # Если нашелся
         if supplier:
             # Заполняем поле с именем
@@ -742,6 +819,7 @@ def update_supplier_page(supplier_id):
         supplier = db_sess.query(Supplier).filter(
             Supplier.id == supplier_id
         ).first()
+        db_sess.close()
         # Если нашелся
         if supplier:
             # Заполняем поле с именем

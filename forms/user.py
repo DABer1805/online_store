@@ -11,8 +11,8 @@ from data.constants import MAX_PRICE, DB_NAME
 import sys
 import os
 
-# Вот тут пришлось вот такими нехорошими вещами заниматься, т.к. при
-# запуске из коммандной строки файл не видит папку data, так что надо
+# Вот тут пришлось вот такими нехорошими вещами заниматься, т.к.
+# файл не видит папку data, так что надо
 # добавить путь к корневой папке приложения следующими 3-мя строчками
 cur_path = os.path.abspath(os.path.dirname(__file__))
 root_path = os.path.split(cur_path)[0]
@@ -71,17 +71,9 @@ class RegisterForm(FlaskForm):
 class AddProductForm(FlaskForm):
     """Форма добавления продукта"""
 
-    session = db_session.create_session()
-    suppliers_names = [
-        supplier.name for supplier in session.query(Supplier).all()
-    ]
-    categories_names = [
-        category.name for category in session.query(Category).all()
-    ]
-
     # Загрузка изображения товара
     product_image = FileField(
-        'Изображение товара', validators=[DataRequired()]
+        'Изображение товара', validators=[Optional()]
     )
     # Имя продукта
     name = StringField('Имя товара', validators=[DataRequired()])
@@ -97,12 +89,10 @@ class AddProductForm(FlaskForm):
     # Категория товара
     category = SelectField(
         'Категория товара',
-        choices=categories_names,
         validators=[DataRequired()]
     )
     supplier = SelectField(
         'Поставщик',
-        choices=suppliers_names,
         validators=[Optional()]
     )
     # Бренд товара

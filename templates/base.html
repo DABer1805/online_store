@@ -47,78 +47,82 @@
                         {% endif %}
                         <li class="nav-item">
                             {% if current_user.is_authenticated %}
-                                <!-- Корзина пользователя (если зареган) -->
-                                <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#modal-cart">
-                                    <!-- Иконка корзины -->
-                                    <i class="fas fa-shopping-cart"></i>
-                                </a>
-                                <div class="modal fade" id="modal-cart" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                    <div class="modal-dialog modal-xl">
-                                        <div class="modal-content">
-                                            <div class="modal-header bg-primary text-white">
-                                                <!-- Заголовок корзины -->
-                                                <h5 class="modal-title" id="exampleModalLabel">Корзина</h5>
-                                                <!-- Кнопка выхода -->
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                            </div>
-                                            <div class="modal-body">
-                                                <!-- Табличка - сама корзина -->
-                                                <table class="table">
-                                                    <!-- Заголовоки -->
-                                                    <thead>
-                                                        <tr>
-                                                            <th></th>
-                                                            <th></th>
-                                                            <th>Цена за 1шт</th>
-                                                            <th>Цена за весь товар</th>
-                                                            <th>Количество товара</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <!-- Наполнение -->
-                                                    <tbody id="basket_table">
-                                                        {% for item in user_basket %}
-                                                            <!-- Вся инфа о товаре -->
-                                                            {% set item_data = item['item'] %}
-                                                            <!-- Количество товара -->
-                                                            {% set amount = item['amount'] %}
-                                                            <!-- Цена товара со скидкой -->
-                                                            {% set new_price = item_data['price'] * (1 - item_data['discount'] * 0.01) %}
-                                                            <tr id="item{{ item_data['id'] }}_cell">
-                                                                <!-- Изображение товара -->
-                                                                <td class="text-center"><img src="/static/img/items/item{{ item_data['id'] }}.png" alt="" class="basket_img"></td>
-                                                                <!-- Название товара -->
-                                                                <td>{{ item_data['name'] }}</td>
-                                                                <!-- Цена товара за 1 шт -->
-                                                                <td id="item{{ item_data['id'] }}_price">{{ new_price|round(2) }}₽</td>
-                                                                <!-- Цена за весь товар -->
-                                                                <td id="item{{ item_data['id'] }}_total_price">{{ (new_price * amount|int)|round(2) }}₽</td>
-                                                                <td id="item{{ item_data['id'] }}_amount" class="noselect">
-                                                                    <a class="del_amount_btn" id="del_amount{{ item_data['id'] }}">
-                                                                        <!-- Кнопка "-" -->
-                                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-dash" viewBox="0 0 16 16">
-                                                                          <path d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8"/>
-                                                                          <!-- Количество товара -->
-                                                                        </svg></a> <span id="amount_container{{ item_data['id'] }}">{{ amount }}</span> <a class="add_amount_btn" id="add_amount{{ item_data['id'] }}">
-                                                                        <!-- Кнопка "+" -->
-                                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
-                                                                          <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
-                                                                        </svg>
-                                                                    </a>
-                                                                </td>
+                                {% if current_user.id != 1 %}
+                                    <!-- Корзина пользователя (если зареган) -->
+                                    <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#modal-cart">
+                                        <!-- Иконка корзины -->
+                                        <i class="fas fa-shopping-cart"></i>
+                                    </a>
+                                    <div class="modal fade" id="modal-cart" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog modal-xl">
+                                            <div class="modal-content">
+                                                <div class="modal-header bg-primary text-white">
+                                                    <!-- Заголовок корзины -->
+                                                    <h5 class="modal-title" id="exampleModalLabel">Корзина</h5>
+                                                    <!-- Кнопка выхода -->
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <!-- Табличка - сама корзина -->
+                                                    <table class="table">
+                                                        <!-- Заголовоки -->
+                                                        <thead>
+                                                            <tr>
+                                                                <th></th>
+                                                                <th></th>
+                                                                <th>Цена за 1шт</th>
+                                                                <th>Цена за весь товар</th>
+                                                                <th>Количество товара</th>
                                                             </tr>
-                                                        {% endfor %}
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <!-- Кнопка закрытия корзины -->
-                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
-                                                <!-- Кнопка оплаты -->
-                                                <button type="button" class="btn btn-primary" id="make_order_btn">Оплатить</button>
+                                                        </thead>
+                                                        <!-- Наполнение -->
+                                                        <tbody id="basket_table">
+                                                            {% for item in user_basket %}
+                                                                <!-- Вся инфа о товаре -->
+                                                                {% set item_data = item['item'] %}
+                                                                <!-- Количество товара -->
+                                                                {% set amount = item['amount'] %}
+                                                                <!-- Цена товара со скидкой -->
+                                                                {% set new_price = item_data['price'] * (1 - item_data['discount'] * 0.01) %}
+                                                                {% set total = total + new_price * amount|int %}
+                                                                <tr id="item{{ item_data['id'] }}_cell">
+                                                                    <!-- Изображение товара -->
+                                                                    <td class="text-center"><img src="/static/img/items/item{{ item_data['id'] }}.png" alt="" class="basket_img"></td>
+                                                                    <!-- Название товара -->
+                                                                    <td>{{ item_data['name'] }}</td>
+                                                                    <!-- Цена товара за 1 шт -->
+                                                                    <td id="item{{ item_data['id'] }}_price">{{ new_price|round(2) }}₽</td>
+                                                                    <!-- Цена за весь товар -->
+                                                                    <td id="item{{ item_data['id'] }}_total_price">{{ (new_price * amount|int)|round(2) }}₽</td>
+                                                                    <td id="item{{ item_data['id'] }}_amount" class="noselect">
+                                                                        <a class="del_amount_btn" id="del_amount{{ item_data['id'] }}">
+                                                                            <!-- Кнопка "-" -->
+                                                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-dash" viewBox="0 0 16 16">
+                                                                              <path d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8"/>
+                                                                              <!-- Количество товара -->
+                                                                            </svg></a> <span id="amount_container{{ item_data['id'] }}">{{ amount }}</span> <a class="add_amount_btn" id="add_amount{{ item_data['id'] }}">
+                                                                            <!-- Кнопка "+" -->
+                                                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+                                                                              <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                                                                            </svg>
+                                                                        </a>
+                                                                    </td>
+                                                                </tr>
+                                                            {% endfor %}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <div id="total-cell">Итого: {{ total }}₽</div>
+                                                    <!-- Кнопка закрытия корзины -->
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                                                    <!-- Кнопка оплаты -->
+                                                    <button type="button" class="btn btn-primary" id="make_order_btn">Оплатить</button>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
+                                {% endif %}
                             {% else %}
                                 <!-- В ином случае, иконка корзины ведет на авторизацию -->
                                 <a class="nav-link" href="/login">
