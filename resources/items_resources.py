@@ -47,7 +47,6 @@ class ItemsResource(Resource):
         os.remove(f'static/img/items/item{item_id}.png')
         # Коммитим
         session.commit()
-        session.close()
         # Возвращаем код успешной отправки
         return jsonify({'success': 'OK'})
 
@@ -86,7 +85,6 @@ class ItemsListResource(Resource):
             items = session.query(Item).filter(
                 Item.price * (1 - Item.discount * 0.01) <= max_price
             )
-        session.close()
         # Возвращаем инфу о товарах
         return jsonify({
             'items': [
@@ -129,7 +127,6 @@ class ItemsListResource(Resource):
         session.add(item)
         # Коммитим
         session.commit()
-        session.close()
         # Возвращаем код успешной отправки
         return jsonify({'id': item.id})
 
@@ -140,7 +137,6 @@ def abort_if_item_not_found(item_id):
     session = db_session.create_session()
     # Получаем товар по Id
     item = session.query(Item).get(item_id)
-    session.close()
     # Если не нашелся
     if not item:
         # Кидаем ошибку

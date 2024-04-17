@@ -56,7 +56,6 @@ class SupplierListResource(Resource):
         session = db_session.create_session()
         # Поставщики
         suppliers = session.query(Supplier).all()
-        session.close()
         # Возвращаем инфу о поставщиках
         return jsonify({
             'suppliers': [
@@ -85,7 +84,6 @@ class SupplierListResource(Resource):
         session.add(supplier)
         # Коммитим
         session.commit()
-        session.close()
         # Возвращаем код успешной отправки
         return jsonify({'id': supplier.id})
 
@@ -96,7 +94,6 @@ def abort_if_supplier_not_found(supplier_id):
     session = db_session.create_session()
     # Поставщик
     supplier = session.query(Supplier).get(supplier_id)
-    session.close()
     # Если поставщик не нашелся
     if not supplier:
         # Кидаем ошибку

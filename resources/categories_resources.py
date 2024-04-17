@@ -13,7 +13,6 @@ class CategoriesResource(Resource):
         # Делаем запрос к БД и получаем категорию по ID
         session = db_session.create_session()
         category = session.query(Category).get(category_id)
-        session.close()
         # Возвращаем информацию о категории в json формате
         return jsonify(
             category.to_dict(only=('id', 'name', 'items.id'))
@@ -30,7 +29,6 @@ class CategoriesResource(Resource):
         session.delete(category)
         # Делаем коммит
         session.commit()
-        session.close()
         # Возвращаем отчет об успешном удалении
         return jsonify({'success': 'OK'})
 
@@ -43,7 +41,6 @@ class CategoriesListResource(Resource):
         # Делаем запрос к БД и получаем список категорий
         session = db_session.create_session()
         categories = session.query(Category).all()
-        session.close()
         # Возвращаем информацию о категориях в json формате
         return jsonify({
             'items': [
@@ -63,7 +60,6 @@ class CategoriesListResource(Resource):
         session.add(category)
         # Делаем коммит
         session.commit()
-        session.close()
         # Возвращаем ID новой категории
         return jsonify({'id': category.id})
 
@@ -74,7 +70,6 @@ def abort_if_category_not_found(category_id):
     session = db_session.create_session()
     # Получаем категорию по Id
     category = session.query(Category).get(category_id)
-    session.close()
     # Если не нашлась
     if not category:
         # Кидаем ошибку

@@ -110,7 +110,6 @@ def login():
         user = db_sess.query(User).filter(
             User.mobile_phone == form.mobile_phone.data
         ).first()
-        db_sess.close()
         # Если пароль совпал и пользователь нашелся
         if user and user.check_password(form.password.data):
             # Авторизизуем пользователя
@@ -152,14 +151,12 @@ def reqister():
         if db_sess.query(User).filter(
                 User.mobile_phone == form.mobile_phone.data
         ).first():
-            db_sess.close()
             # Открываем страничку с формой и выводим уведомление о
             # некорректности данных
             return render_template(
                 'register.html', title='Регистрация', host_data=request.host,
                 form=form, message="Такой пользователь уже есть"
             )
-        db_sess.close()
         # Добавляем в БД нового пользователя
         post(
             f'http://{request.host}/api/users',
@@ -197,7 +194,6 @@ def change_user_data():
         db_sess = db_session.create_session()
         # Достаём нашего пользователя из БД
         user = db_sess.query(User).filter(User.id == current_user.id).first()
-        db_sess.close()
         # Если нашелся
         if user:
             # Заполяняем поле с номером телефона
@@ -231,7 +227,6 @@ def change_user_data():
             if db_sess.query(User).filter(
                     User.mobile_phone == form.mobile_phone.data
             ).count() > 1:
-                db_sess.close()
                 # Открываем страничку с формой и выводим уведомление о
                 # некорректности данных
                 return render_template(
@@ -473,7 +468,6 @@ def add_product_page():
     categories_names = [
         category.name for category in session.query(Category).all()
     ]
-    session.close()
 
     # создание формы добавления товаров
     form = AddProductForm()
@@ -502,7 +496,6 @@ def add_product_page():
                                                 filename)
                     image.save(path_to_save)
                 else:
-                    session.close()
                     return render_template(
                         'add_product.html', title="Страница управления",
                         form=form, message="Недопустимый формат изображения"
@@ -548,7 +541,6 @@ def add_product_page():
                     "composition": form.composition.data,
                 }
             )
-            session.close()
             return redirect('/admin')
 
         return render_template(
@@ -569,7 +561,6 @@ def update_product_page(item_id):
     categories_names = [
         category.name for category in session.query(Category).all()
     ]
-    session.close()
 
     # создание формы добавления товаров
     form = AddProductForm()
@@ -582,7 +573,6 @@ def update_product_page(item_id):
         session = db_session.create_session()
         # Достаём товар из БД
         item = session.query(Item).filter(Item.id == item_id).first()
-        session.close()
         # Если нашелся
         if item:
             # Заполяняем поле с названием товара
@@ -795,7 +785,6 @@ def update_supplier_page(supplier_id):
         supplier = db_sess.query(Supplier).filter(
             Supplier.id == supplier_id
         ).first()
-        db_sess.close()
         # Если нашелся
         if supplier:
             # Заполняем поле с именем
@@ -819,7 +808,6 @@ def update_supplier_page(supplier_id):
         supplier = db_sess.query(Supplier).filter(
             Supplier.id == supplier_id
         ).first()
-        db_sess.close()
         # Если нашелся
         if supplier:
             # Заполняем поле с именем

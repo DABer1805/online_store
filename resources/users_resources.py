@@ -14,7 +14,6 @@ class UsersResource(Resource):
         session = db_session.create_session()
         # Пользователь
         user = session.query(User).get(user_id)
-        session.close()
         # Возвращаем инфу о пользователе
         return jsonify(
             {'user': user.to_dict(
@@ -37,7 +36,6 @@ class UsersResource(Resource):
         session.delete(user)
         # Коммитим
         session.commit()
-        session.close()
         # Возвращаем код успешной операции
         return jsonify({'success': 'OK'})
 
@@ -49,7 +47,6 @@ class UsersListResource(Resource):
         session = db_session.create_session()
         # Пользователи
         users = session.query(User).all()
-        session.close()
         # Возвращаем инфу о пользователях
         return jsonify({
             'users': [
@@ -76,7 +73,6 @@ class UsersListResource(Resource):
         session.add(user)
         # Коммитим
         session.commit()
-        session.close()
         return jsonify({'id': user.id})
 
 
@@ -86,7 +82,6 @@ def abort_if_user_not_found(user_id):
     session = db_session.create_session()
     # Получаем заказ
     order = session.query(User).get(user_id)
-    session.close()
     # Если заказ не нашелся
     if not order:
         # Кидаем ошибку
