@@ -5,7 +5,7 @@
 
 
 // События для слайдера (перемещение мышки: обычное и с зажатой конпкой)
-const events = ['mousemove', 'touchmove'];
+const events = ['mousemove', 'touchmove', 'click'];
 
 // Привязываем функцию изменения текущей цены (фильтр) к слайдеру
 $.each(events, function(k,v) {

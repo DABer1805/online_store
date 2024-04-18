@@ -19,8 +19,8 @@ from data.secret_key import SECRET_KEY
 from data.users import User
 from data.items import Item
 from data.categories import Category
-from forms.user import LoginForm, RegisterForm, AddProductForm, \
-    AddSupplierForm
+from forms.user import LoginForm, RegisterForm
+from forms.admin import AddProductForm, AddSupplierForm
 
 from flask_login import LoginManager, login_user, login_required, \
     logout_user, current_user
