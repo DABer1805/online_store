@@ -24,7 +24,24 @@ def test_item_post_1_correct():
             'price': 125,
             'discount': 20,
             'supplier': 1,
-            'category': 1
+            'category': 1,
+            'brand': 'brand',
+            'type': 'type',
+            'type_of_packing': 'type_of_packing',
+            'width': '0',
+            'height': '0',
+            'depth': '0',
+            'weight': '0',
+            'capacity': '0',
+            'min_temp': '0',
+            'max_temp': '0',
+            'expiration_date': '',
+            'calories': '0',
+            'squirrels': '0',
+            'fats': '0',
+            'carbohydrates': '0',
+            'description': 'description',
+            'composition': 'composition'
         }
     ).json() == {'id': 1}
 
@@ -36,9 +53,15 @@ def test_item_get_by_id_correct():
     """
     assert get('http://localhost:5000/api/items/1').json() == {
         'item': {
-            'category': 1, 'discount': 20,
-            'name': 'Item 1', 'price': 125,
-            'supplier': 1
+            'brand': 'brand', 'calories': '0', 'capacity': '0',
+            'carbohydrates': '0', 'category': 1,
+            'composition': 'composition', 'depth': '0',
+            'description': 'description', 'discount': 20.0,
+            'expiration_date': '', 'fats': '0', 'height': '0', 'id': 1,
+            'max_temp': '0', 'min_temp': '0', 'name': 'Item 1',
+            'price': 125.0, 'squirrels': '0', 'supplier': 'Supplier 1',
+            'type': 'type', 'type_of_packing': 'type_of_packing',
+            'weight': '0', 'width': '0'
         }
     }
 
@@ -55,27 +78,47 @@ def test_item_post_2_correct():
             'price': 145,
             'discount': 50,
             'supplier': 1,
-            'category': 1
+            'category': 1,
+            'brand': 'brand',
+            'type': 'type',
+            'type_of_packing': 'type_of_packing',
+            'width': '0',
+            'height': '0',
+            'depth': '0',
+            'weight': '0',
+            'capacity': '0',
+            'min_temp': '0',
+            'max_temp': '0',
+            'expiration_date': '',
+            'calories': '0',
+            'squirrels': '0',
+            'fats': '0',
+            'carbohydrates': '0',
+            'description': 'description',
+            'composition': 'composition'
         }
     ).json() == {'id': 2}
 
 
 def test_item_get_list():
-    """ Тестируем get запрос на получение одного товара -
+    """ Тестируем get запрос на получение нескольких товаров -
     таблица товаров пустая
 
     """
     assert get('http://localhost:5000/api/items').json() == {
-        'items': [{'discount': 20, 'name': 'Item 1', 'price': 125},
-                  {'discount': 50, 'name': 'Item 2', 'price': 145}]
-    }
+        'items': [
+            {'discount': 20.0, 'id': 1, 'name': 'Item 1', 'price': 125.0},
+            {'discount': 50.0, 'id': 2, 'name': 'Item 2', 'price': 145.0}
+        ]}
 
 
-def test_delete_item_by_id_correct():
-    """ Тестируем get запрос на получение одного товара -
-    таблица товаров пустая
+
+def test_delete_item_by_id_incorrect():
+    """ Тестируем get запрос на получение одного поставщика по ID, запрос
+    корректный, но поставщика с таким ID не существует (нет поставщика с
+    ID = 999)
 
     """
-    assert delete('http://localhost:5000/api/items/2').json() == {
-        'success': 'OK'
+    assert delete('http://localhost:5000/api/items/999').json() == {
+        'message': 'Item 999 not found'
     }

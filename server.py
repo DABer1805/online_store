@@ -656,10 +656,8 @@ def update_product_page(item_id):
                 if image.filename:
                     # Проверка формата файла:
                     if image.filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS:
-                        # Определяем имя файла на основе id последнего
-                        # товара в бд
-                        id_amount = len(session.query(Item.id).all())
-                        filename = f"item{id_amount + 1}.png"
+                        # Имя файла
+                        filename = f"item{item_id}.png"
                         # Здесь указывается путь до папки на сервере,
                         # где будет сохранен файл
                         path_to_save = os.path.join('./static/img/items',

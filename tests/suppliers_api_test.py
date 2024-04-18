@@ -36,9 +36,9 @@ def test_supplier_get_list():
     """ Тестируем get запрос на получение списка всех поставщиков """
     assert get('http://localhost:5000/api/suppliers').json() == {
         'suppliers': [
-            {'mobile_phone': '+736502116389', 'name': 'Supplier 1',
+            {'id': 1, 'mobile_phone': '+736502116389', 'name': 'Supplier 1',
              'payment_account': '01398745623015069842'},
-            {'mobile_phone': '+71651237896', 'name': 'Supplier 2',
+            {'id': 2, 'mobile_phone': '+71651237896', 'name': 'Supplier 2',
              'payment_account': '19478563214569870123'}
         ]
     }
@@ -51,8 +51,10 @@ def test_supplier_get_by_id_correct():
     """
     assert get('http://localhost:5000/api/suppliers/1').json() == {
         'user': {
-            'address': 'address 1', 'email': 'email1@email.ru',
-            'items': [], 'mobile_phone': '+736502116389',
+            'address': 'address 1',
+            'email': 'email1@email.ru',
+            'id': 1, 'items': [],
+            'mobile_phone': '+736502116389',
             'name': 'Supplier 1',
             'payment_account': '01398745623015069842'
         }

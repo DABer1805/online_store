@@ -30,8 +30,9 @@ def test_category_get_by_id_correct():
 
     """
     assert get('http://localhost:5000/api/categories/1').json() == {
-        'categories': {'items': [], 'name': 'Category 1'}
+        'id': 1, 'items': [], 'name': 'Category 1'
     }
+
 
 
 def test_category_get_empty_by_id_incorrect():

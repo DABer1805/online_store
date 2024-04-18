@@ -21,8 +21,6 @@ sys.path.append(root_path)
 from data import db_session
 from data.suppliers import Supplier
 
-db_session.global_init(f'db/{DB_NAME}')
-
 
 class LoginForm(FlaskForm):
     """ Форма авторизации пользователя """

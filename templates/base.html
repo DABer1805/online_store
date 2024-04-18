@@ -37,7 +37,7 @@
                             <a class="navbar-brand" href="{{ '/admin' if current_user.id == 1 else '/personal_account' }}" id="{{current_user.id}}" name="current_user">{{ current_user.name }} {{ current_user.surname }}</a>
                         {% else %}
                             <!-- Выпадающее окошечко, в противном случае -->
-                            <li class="nav-item dropdown">
+                            <li class="nav-item dropdown" name="current_user">
                                 <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#"><i class="far fa-user"></i></a>
                                 <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                                     <li><a class="dropdown-item" href="/register">Регистрация</a></li>

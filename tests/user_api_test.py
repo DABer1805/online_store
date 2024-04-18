@@ -48,9 +48,20 @@ def test_user_post_2_correct():
 def test_user_get_list():
     """ Тестируем get запрос на получение списка всех пользователей """
     assert get('http://localhost:5000/api/users').json() == {
-        'users': [{'items_list': '1x4', 'mobile_phone': '+736502116389'},
-                  {'items_list': '1x15', 'mobile_phone': '+71651237896'}]
+        'users': [
+            {
+                'id': 1, 'items_list': '1x4',
+                'mobile_phone': '+736502116389', 'name': 'User 1 name',
+                'surname': 'User 1 surname'
+            },
+            {
+                'id': 2, 'items_list': '1x15',
+                'mobile_phone': '+71651237896', 'name': 'User 2 name',
+                'surname': 'User 2 surname'
+            }
+        ]
     }
+
 
 
 def test_user_get_by_id_correct():
@@ -59,9 +70,12 @@ def test_user_get_by_id_correct():
 
     """
     assert get('http://localhost:5000/api/users/1').json() == {
-        'user': {'items_list': '1x4', 'mobile_phone': '+736502116389',
-                 'name': 'User 1 name', 'surname': 'User 1 surname'}
+        'user': {
+            'id': 1, 'items_list': '1x4', 'mobile_phone': '+736502116389',
+            'name': 'User 1 name', 'surname': 'User 1 surname'
+        }
     }
+
 
 
 def test_user_get_by_id_incorrect():
