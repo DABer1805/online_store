@@ -198,8 +198,6 @@ db_session.global_init(f'db/{TEST_DB_NAME}')
 
 + ***HttpGet('/api/make_order/\<int:user_id>')*** - создание заказа
 
-+ ***HttpGet('/api/del_item_in_basket_api/\<int:item_id>/\<int:user_id>')*** 
-- удаление товара в корзине
-- 
-+ ***HttpGet('/api/del_item_in_basket_api/\<int:item_id>/\<int:user_id>')*** 
-- удаление товара в корзину
++ ***HttpGet('/api/del_item_in_basket_api/\<int:item_id>/\<int:user_id>')*** - удаление товара в корзине
+
++ ***HttpGet('/api/add_item_to_basket/\<int:item_id>/\<int:user_id>')*** - добавление товара в корзину
