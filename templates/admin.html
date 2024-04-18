@@ -130,20 +130,22 @@
                                     <!-- Контент -->
                                     <tbody>
                                         {% for user in users %}
-                                            <tr>
-                                                <!-- Id товара -->
-                                                <th scope="row">{{ user['id'] }}</th>
-                                                <!-- Название товара -->
-                                                <td>{{ user['name'] }} {{ user['surname'] }}</td>
-                                                <!-- Номер мобильного телефона -->
-                                                <td>{{ user['mobile_phone'] }}</td>
-                                                <!-- Кнопка удаления -->
-                                                <td>
-                                                    <button type="button" class="btn btn-danger">
-                                                        <a href="#" class="delete-user-btn" data-user-id="{{ user['id'] }}" style="color: inherit; text-decoration: none;">Удалить</a>
-                                                    </button>
-                                                </td>
-                                            </tr>
+                                            {% if user['id'] != 1 %}
+                                                <tr>
+                                                    <!-- Id товара -->
+                                                    <th scope="row">{{ user['id'] }}</th>
+                                                    <!-- Название товара -->
+                                                    <td>{{ user['name'] }} {{ user['surname'] }}</td>
+                                                    <!-- Номер мобильного телефона -->
+                                                    <td>{{ user['mobile_phone'] }}</td>
+                                                    <!-- Кнопка удаления -->
+                                                    <td>
+                                                        <button type="button" class="btn btn-danger">
+                                                            <a href="#" class="delete-user-btn" data-user-id="{{ user['id'] }}" style="color: inherit; text-decoration: none;">Удалить</a>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            {% endif %}
                                         {% endfor %}
                                     </tbody>
                                 </table>

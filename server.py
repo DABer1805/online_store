@@ -1,9 +1,9 @@
 import os
 
 from PIL import Image
-from flask import Flask, render_template, redirect, request, url_for, abort
+from flask import Flask, render_template, redirect, request, url_for
 from flask_cors import CORS, cross_origin
-from flask_restful import Api
+from flask_restful import Api, abort
 from requests import get, post
 
 from api import user_basket_api, add_item_to_basket_api, \
@@ -187,6 +187,9 @@ def reqister():
 @app.route('/change_user_data', methods=['GET', 'POST'])
 def change_user_data():
     """ Редактирование данных пользователя """
+    if current_user.is_authenticated and current_user.id == 1:
+        # Админ не должен попасть на эту страницу
+        abort(404, message=f"No access rights")
     form = RegisterForm()
     # Подгрузка текущей инфы в поля формочки
     if request.method == "GET":
@@ -260,6 +263,15 @@ def change_user_data():
 @cross_origin()
 def catalog():
     """ Каталог с товарами """
+    # Проверяем, авторизован ли пользователь, и если да, то получаем список
+    # тех товаров, которые он выбрал
+    if current_user.is_authenticated:
+        # Админ не должен попасть на эту страницу
+        if current_user.id == 1:
+            abort(404, message=f"No access rights")
+        items_list = current_user.items_list
+    else:
+        items_list = ''
     # Параметры
     params = {}
     # Нажатые чекбоксы
@@ -295,12 +307,6 @@ def catalog():
             f'/catalog?cat={",".join(request.form.getlist("cat"))}&'
             f'max_price={request.form.get("price_range")}'
         )
-    # Проверяем, авторизован ли пользователь, и если да, то получаем список
-    # тех товаров, которые он выбрал
-    if current_user.is_authenticated:
-        items_list = current_user.items_list
-    else:
-        items_list = ''
     # Получаем список товаров, которые лежат в корзине пользователя,
     # включая количество товаров
     user_basket_info = get(
@@ -328,6 +334,15 @@ def catalog():
 
 @app.route("/catalog/<int:item_id>")
 def item_page(item_id):
+    # Проверяем, авторизован ли пользователь, и если да, то получаем список
+    # тех товаров, которые он выбрал
+    if current_user.is_authenticated:
+        # Админ не должен попасть на эту страницу
+        if current_user.id == 1:
+            abort(404, message=f"No access rights")
+        items_list = current_user.items_list
+    else:
+        items_list = ''
     # Получаем инфо о выбранном предмете
     item = get(f'http://{request.host}/api/items/{item_id}').json()['item']
     # Категории предыдущей страницы каталога
@@ -349,12 +364,6 @@ def item_page(item_id):
         }
     else:
         categories = {}
-    # Проверяем, авторизован ли пользователь, и если да, то получаем список
-    # тех товаров, которые он выбрал
-    if current_user.is_authenticated:
-        items_list = current_user.items_list
-    else:
-        items_list = ''
     # Получаем список товаров, которые лежат в корзине пользователя,
     # включая количество товаров
     # Получаем список товаров, которые лежат в корзине пользователя,
@@ -374,16 +383,19 @@ def item_page(item_id):
 
 @app.route("/")
 def home_page():
+    # Проверяем, авторизован ли пользователь, и если да, то получаем список
+    # тех товаров, которые он выбрал
+    if current_user.is_authenticated:
+        # Админ не должен попасть на эту страницу
+        if current_user.id == 1:
+            abort(404, message=f"No access rights")
+        items_list = current_user.items_list
+    else:
+        items_list = ''
     slides = os.listdir(url_for("static", filename="img/slides")[1:])
     discounted_items = get(
         f'http://{request.host}/api/items', params={'only_discount': True}
     ).json()['items']
-    # Проверяем, авторизован ли пользователь, и если да, то получаем список
-    # тех товаров, которые он выбрал
-    if current_user.is_authenticated:
-        items_list = current_user.items_list
-    else:
-        items_list = ''
     # Получаем список товаров, которые лежат в корзине пользователя,
     # включая количество товаров
     user_basket_info = get(
@@ -403,6 +415,9 @@ def home_page():
 @app.route("/personal_account")
 def personal_account():
     if current_user.is_authenticated:
+        # Админ не должен попасть на эту страницу
+        if current_user.id == 1:
+            abort(404, message=f"No access rights")
         # Если страница открыта из каталога
         from_catalog = request.args.get('from_catalog')
         # Если открыта страница из товарной страницы
@@ -475,7 +490,7 @@ def add_product_page():
     form.category.choices = categories_names
 
     # Проверка id пользователя (доступ только для id == 1)
-    if current_user.id == 1:
+    if current_user.is_authenticated and current_user.id == 1:
         # Если нажата кнопка отправки формы
         if form.validate_on_submit():
             session = db_session.create_session()
@@ -735,7 +750,7 @@ def add_supplier_page():
     form = AddSupplierForm()
 
     # Проверка id пользователя (доступ только для id == 1)
-    if int(current_user.get_id()) == 1:
+    if current_user.is_authenticated and current_user.id == 1:
         # Если нажата кнопка отправки формы
         if form.validate_on_submit():
             # Сессия подключения к БД
@@ -839,7 +854,7 @@ def admin():
     """Страничка админа"""
 
     # Проверка id пользователя (доступ только для id == 1)
-    if int(current_user.get_id()) == 1:
+    if current_user.is_authenticated and current_user.id == 1:
         users = get(f'http://{request.host}/api/users').json()['users']
         items = get(f'http://{request.host}/api/items').json()['items']
         suppliers = get(
