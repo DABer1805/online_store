@@ -3,7 +3,8 @@
 {% block content %}
     <!-- Служебные данные для сборки ссылок возврата -->
     <meta id="cat-filters" data-cat-filters="{{ cat_filters }}"
-          data-cat-ids="{{ checked_buttons|join(',') }}">
+          data-cat-ids="{{ checked_buttons|join(',') }}"
+          data-max-price="{{ cur_price }}">
     <div class="container">
         <div class="row">
             <div class="col-12 breadcrumb-container">

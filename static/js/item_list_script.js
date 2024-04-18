@@ -14,6 +14,8 @@ $.each(events, function(k,v) {
     });
 })
 
+// Фильтр максимальной цены
+var maxPrice = $('#cat-filters').data()['maxPrice'];
 // Названия фильтров
 var catFilters = $('#cat-filters').data()['catFilters'];
 // Id фильтров
@@ -29,6 +31,9 @@ var link = `${personalAccountLink}?from_catalog=true`;
 if (catFilters != 'None') {
     link = link + `&cat_filters=${catFilters}&cat=${catIds}`
 }
+// Приделываем фильтр цены
+link = link + `&max_price=${maxPrice}`;
+
 // И меняем атрибут у кнопк иперехода в личный кабинет
 personalAccountLink.setAttribute('href', link);
 
