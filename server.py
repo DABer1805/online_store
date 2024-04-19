@@ -872,7 +872,7 @@ def admin():
 
 def main():
     # Устанавливаем соединение с БД
-    db_session.global_init(f'db/{TEST_DB_NAME}')
+    db_session.global_init(f'db/{DB_NAME}')
     # Запускаем предложение
     app.run()
 
