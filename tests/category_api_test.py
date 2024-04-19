@@ -1,5 +1,17 @@
+import os
+import sys
+
 import pytest
 from requests import get, post, delete
+
+# Вот тут пришлось вот такими нехорошими вещами заниматься, т.к. при
+# запуске из коммандной строки файл не видит папаку data, так что надо
+# добавить путь к корневой папке приложения следующими 3-мя строчками
+cur_path = os.path.abspath(os.path.dirname(__file__))
+root_path = os.path.split(cur_path)[0]
+sys.path.append(root_path)
+
+from data.constants import HOST_NAME
 
 
 # Тесты ресурса с категориями
@@ -7,7 +19,7 @@ from requests import get, post, delete
 def test_category_post_1_correct():
     """ Тестируем post запрос на добавление категории """
     assert post(
-        'http://localhost:5000/api/categories',
+        f'http://{HOST_NAME}/api/categories',
         json={
             'name': 'Category 1',
         }
@@ -17,7 +29,7 @@ def test_category_post_1_correct():
 def test_category_post_2_correct():
     """ Тестируем post запрос на добавление еще одной категории """
     assert post(
-        'http://localhost:5000/api/categories',
+        f'http://{HOST_NAME}/api/categories',
         json={
             'name': 'Category 2',
         }
@@ -29,10 +41,9 @@ def test_category_get_by_id_correct():
     корректный (есть категория с ID = 1)
 
     """
-    assert get('http://localhost:5000/api/categories/1').json() == {
+    assert get(f'http://{HOST_NAME}/api/categories/1').json() == {
         'id': 1, 'items': [], 'name': 'Category 1'
     }
-
 
 
 def test_category_get_empty_by_id_incorrect():
@@ -41,7 +52,7 @@ def test_category_get_empty_by_id_incorrect():
     ID = 999)
 
     """
-    assert get('http://localhost:5000/api/categories/999').json() == {
+    assert get(f'http://{HOST_NAME}/api/categories/999').json() == {
         'message': 'Category 999 not found'
     }
 
@@ -51,7 +62,7 @@ def test_category_delete_by_id_correct():
     корректный (есть категория с ID = 2)
 
     """
-    assert delete('http://localhost:5000/api/categories/2').json() == {
+    assert delete(f'http://{HOST_NAME}/api/categories/2').json() == {
         'success': 'OK'
     }
 
@@ -62,6 +73,6 @@ def test_category_delete_empty_by_id_incorrect():
     ID = 999)
 
     """
-    assert delete('http://localhost:5000/api/categories/999').json() == {
+    assert delete(f'http://{HOST_NAME}/api/categories/999').json() == {
         'message': 'Category 999 not found'
     }

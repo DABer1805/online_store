@@ -12,7 +12,7 @@ cur_path = os.path.abspath(os.path.dirname(__file__))
 root_path = os.path.split(cur_path)[0]
 sys.path.append(root_path)
 
-from data.constants import TEST_DB_NAME
+from data.constants import TEST_DB_NAME, HOST_NAME
 from data import db_session
 from data.users import User
 
@@ -22,7 +22,7 @@ from data.users import User
 def test_user_post_1_correct():
     """ Тестируем post запрос на добавление пользователя """
     assert post(
-        'http://localhost:5000/api/users',
+        f'http://{HOST_NAME}/api/users',
         json={
             'name': 'User 1 name',
             'surname': 'User 1 surname',
@@ -35,7 +35,7 @@ def test_user_post_1_correct():
 def test_user_post_2_correct():
     """ Тестируем post запрос на добавление еще одного пользователя """
     assert post(
-        'http://localhost:5000/api/users',
+        f'http://{HOST_NAME}/api/users',
         json={
             'name': 'User 2 name',
             'surname': 'User 2 surname',
@@ -47,7 +47,7 @@ def test_user_post_2_correct():
 
 def test_user_get_list():
     """ Тестируем get запрос на получение списка всех пользователей """
-    assert get('http://localhost:5000/api/users').json() == {
+    assert get(f'http://{HOST_NAME}/api/users').json() == {
         'users': [
             {
                 'id': 1, 'items_list': '1x4',
@@ -69,7 +69,7 @@ def test_user_get_by_id_correct():
     корректный (есть пользователя с ID = 1)
 
     """
-    assert get('http://localhost:5000/api/users/1').json() == {
+    assert get(f'http://{HOST_NAME}/api/users/1').json() == {
         'user': {
             'id': 1, 'items_list': '1x4', 'mobile_phone': '+736502116389',
             'name': 'User 1 name', 'surname': 'User 1 surname'
@@ -84,7 +84,7 @@ def test_user_get_by_id_incorrect():
     ID = 999)
 
     """
-    assert get('http://localhost:5000/api/users/999').json() == {
+    assert get(f'http://{HOST_NAME}/api/users/999').json() == {
         'message': 'User 999 not found'
     }
 
@@ -95,7 +95,7 @@ def test_user_delete_by_id_correct():
     корректный (есть пользователя с ID = 2)
 
     """
-    assert delete('http://localhost:5000/api/users/2').json() == {
+    assert delete(f'http://{HOST_NAME}/api/users/2').json() == {
         'success': 'OK'
     }
 
@@ -106,7 +106,7 @@ def test_user_delete_by_id_incorrect():
     ID = 999)
 
     """
-    assert delete('http://localhost:5000/api/users/999').json() == {
+    assert delete(f'http://{HOST_NAME}/api/users/999').json() == {
         'message': 'User 999 not found'
     }
 

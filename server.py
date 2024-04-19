@@ -25,6 +25,9 @@ from forms.admin import AddProductForm, AddSupplierForm
 from flask_login import LoginManager, login_user, login_required, \
     logout_user, current_user
 
+# При хостинге необходимо http протоколы заменить на https, чтобы все
+# корректно работало )))
+
 # Задаем конфигурацию приложения
 app = Flask(__name__)
 cors = CORS(app)
@@ -869,7 +872,7 @@ def admin():
 
 def main():
     # Устанавливаем соединение с БД
-    db_session.global_init(f'db/{DB_NAME}')
+    db_session.global_init(f'db/{TEST_DB_NAME}')
     # Запускаем предложение
     app.run()
 
