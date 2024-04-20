@@ -81,9 +81,9 @@ def abort_if_user_not_found(user_id):
     # Сессия подключения к БД
     session = db_session.create_session()
     # Получаем заказ
-    order = session.query(User).get(user_id)
+    user = session.query(User).get(user_id)
     # Если заказ не нашелся
-    if not order:
+    if not user:
         # Кидаем ошибку
         abort(404, message=f"User {user_id} not found")
 
