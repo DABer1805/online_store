@@ -17,6 +17,25 @@ async function fetchAsync(url) {
     return data;
 }
 
+// Запрет на двойную отправку формы (если как бешеный тыкать по кнопке
+// отправки формы, то все эти запросы отправятся, это очень нехорошо)
+jQuery.fn.preventDoubleSubmission = function() {
+  $(this).on('submit',function(e){
+    var $form = $(this);
+
+    if ($form.data('submitted') === true) {
+      e.preventDefault();
+    } else {
+      $form.data('submitted', true);
+    }
+  });
+
+  return this;
+};
+
+// Применяем нашу функцию к формам
+$('form').preventDoubleSubmission();
+
 // Добавление товара в корзину
 function addItemToBasket(itemId) {
     // ID пользователя
