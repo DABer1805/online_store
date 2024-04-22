@@ -166,7 +166,7 @@ db_session.global_init(f'db/{TEST_DB_NAME}')
 # Хостинг
 
 Хостинг сайта был произведен с помощью сервиса Glitch
-Приложение доступно по такому адресу: [online-store-14.glitch.me]()
+Приложение доступно по такому адресу: [online-store-15.glitch.me]()
 
 ---
 # Список api
