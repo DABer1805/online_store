@@ -506,7 +506,7 @@ def add_product_page():
                 # Проверка формата файла:
                 if image.filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS:
                     # Определяем имя файла на основе id последнего товара в бд
-                    id_amount = len(session.query(Item.id).all())
+                    id_amount = session.query(Item).all()[-1].id
                     filename = f"item{id_amount + 1}.png"
                     # Здесь указывается путь до папки на сервере,
                     # где будет сохранен файл
